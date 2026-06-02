@@ -161,6 +161,76 @@
       z-index: 1;
     }
     .nav-item > * { position: relative; z-index: 1; }
+
+    /* ── Main Content ── */
+    .main {
+      flex: 1;
+      min-height: 100vh;
+      position: relative;
+      background:
+        radial-gradient(ellipse 60% 40% at 85% 8%,  rgba(56,189,248,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(129,140,248,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 20% at 50% 100%, rgba(56,189,248,0.05) 0%, transparent 100%),
+        linear-gradient(180deg, #071020 0%, #030b18 50%, #0a1a2e 100%);
+    }
+    .main::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 20%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 20%, transparent 100%);
+    }
+
+    .content { padding: 36px 40px; position: relative; z-index: 1; }
+
+    /* Section template */
+    .section { margin-bottom: 56px; }
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      background: rgba(56,189,248,0.07);
+      border: 1px solid rgba(56,189,248,0.12);
+      padding: 4px 11px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .section-eyebrow::before { content: '◆'; font-size: 6px; }
+    .section-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 12px;
+      letter-spacing: -0.8px;
+    }
+    .section-title span {
+      background: linear-gradient(120deg, var(--accent) 0%, var(--accent-light) 50%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.75;
+      max-width: 540px;
+      margin-bottom: 24px;
+    }
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 56px;
+    }
   </style>
 </head>
 <body>
@@ -195,7 +265,13 @@
     </aside>
 
     <main class="main" id="main">
-      <!-- sections go here -->
+      <div class="content">
+        <section class="section" id="what-is-mcp">
+          <div class="section-eyebrow">Section 01</div>
+          <div class="section-title">What is <span>MCP</span>?</div>
+          <div class="section-desc">Content coming in the next task.</div>
+        </section>
+      </div>
     </main>
   </div>
   <script>
