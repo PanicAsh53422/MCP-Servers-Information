@@ -337,33 +337,211 @@
 
     <main class="main" id="main">
       <div class="content">
+
+        <!-- ── Section 1: What is MCP ── -->
         <section class="section" id="what-is-mcp">
           <div class="section-eyebrow">Section 01</div>
           <div class="section-title">What is <span>MCP</span>?</div>
-          <div class="section-desc">Placeholder — real content next task.</div>
+          <div class="section-desc">
+            Model Context Protocol is an open standard by Anthropic that lets AI models communicate with external tools, APIs, and data sources through one unified interface. Think of it as USB-C for AI integrations.
+          </div>
           <div class="cards">
-            <div class="card open">
+            <div class="card">
               <div class="card-header">
-                <div class="card-header-left">
-                  <div class="card-num">01</div>
-                  <div class="card-title">Test card — click to close</div>
-                </div>
+                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Why does MCP exist?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">This card body is visible because the card starts open. Click the card to close it, then click again to reopen.</div>
+              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. MCP standardizes how models discover and invoke tools — so a server written once works with any MCP-compatible client: Claude Desktop, Cursor, VS Code, Continue, and more.</div>
             </div>
             <div class="card">
               <div class="card-header">
-                <div class="card-header-left">
-                  <div class="card-num">02</div>
-                  <div class="card-title">Test card — click to open</div>
-                </div>
+                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">How is it different from a REST API?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">Opening this card should close card 01 above.</div>
+              <div class="card-body">REST APIs are designed for app-to-app communication with a known schema. MCP is designed for AI-to-tool communication — it includes a built-in discovery step where the model queries what tools are available at runtime, then decides which to call based on the user's request.</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Who created it and who supports it?</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">Created by Anthropic and open-sourced in late 2024. Now supported across Claude Desktop, Cursor, VS Code Copilot Chat, Continue, Zed, and a growing list of AI clients. The spec and SDKs are maintained at <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">github.com/modelcontextprotocol</code>.</div>
             </div>
           </div>
         </section>
+
+        <hr class="section-divider" />
+
+        <!-- ── Section 2: How it Works ── -->
+        <section class="section" id="how-it-works">
+          <div class="section-eyebrow">Section 02</div>
+          <div class="section-title">How it <span>Works</span></div>
+          <div class="section-desc">
+            MCP uses a client-server architecture. The AI client connects to one or more servers, each of which exposes capabilities the model can use during a conversation.
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">The three layers: Host, Client, Server</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                <strong style="color:var(--text-mid)">Host</strong> — the application the user runs (e.g. Claude Desktop, Cursor). It manages the user session and holds one or more clients.<br><br>
+                <strong style="color:var(--text-mid)">Client</strong> — lives inside the host; maintains a 1:1 connection with one MCP server. Forwards tool calls from the model to the server.<br><br>
+                <strong style="color:var(--text-mid)">Server</strong> — a separate process (or remote service) that exposes tools, resources, and prompts. You build this.
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Transport types: stdio vs HTTP+SSE</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                <strong style="color:var(--text-mid)">stdio</strong> — the host spawns your server as a child process and communicates over stdin/stdout. Used for local servers. Simple, no networking required.<br><br>
+                <strong style="color:var(--text-mid)">HTTP + SSE</strong> — server runs as an HTTP service; client connects via Server-Sent Events for streaming. Used for remote or shared servers.
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">The request flow</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                1. User sends a message to the AI.<br>
+                2. Model decides a tool call is needed and emits a tool-call request.<br>
+                3. Client routes the request to the appropriate MCP server.<br>
+                4. Server executes the tool and returns a result.<br>
+                5. Result is injected back into the model's context.<br>
+                6. Model generates a final response using the result.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider" />
+
+        <!-- ── Section 3: Core Capabilities ── -->
+        <section class="section" id="core-capabilities">
+          <div class="section-eyebrow">Section 03</div>
+          <div class="section-title">Core <span>Capabilities</span></div>
+          <div class="section-desc">
+            MCP servers expose three primitives. Tools are the most common — resources and prompts round out the spec for more advanced use cases.
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Tools — functions the model can call</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">A tool is a named function with a description and a JSON Schema defining its inputs. The model reads the description to decide when to use it, then passes validated arguments. Tools can do anything: query a database, call an API, run a shell command, write a file.</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Resources — read-only context the model can access</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">Resources are identified by a URI (e.g. <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">file:///path/to/doc.txt</code>) and return text or binary content. Unlike tools, resources are passive — the model or host fetches them, rather than invoking them with arguments. Useful for exposing files, database rows, or documentation.</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Prompts — reusable prompt templates</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">A server can expose named prompt templates with dynamic arguments. The host can surface these as slash-commands or quick actions in the UI. Less commonly used than tools, but useful for standardizing repeated workflows — e.g. a "summarize PR" prompt that always fetches the latest diff first.</div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider" />
+
+        <!-- ── Section 4: Popular Servers ── -->
+        <section class="section" id="popular-servers">
+          <div class="section-eyebrow">Section 04</div>
+          <div class="section-title">Popular <span>Servers</span></div>
+          <div class="section-desc">
+            The MCP ecosystem has hundreds of servers. These seven are the most useful for classroom work — each installs with a single command and covers a distinct capability.
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Filesystem — read and write local files</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                The simplest MCP server. Gives Claude access to a directory you specify — it can list, read, write, and search files within it. Great starting point for understanding how MCP tools work.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude read your notes folder and summarize what you worked on this week.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-filesystem /path/to/folder</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">GitHub — repos, PRs, issues, and code</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Search repositories, read file contents, list and create pull requests, open issues, and post comments — all without leaving Claude. Requires a GitHub personal access token.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Ask Claude to review your latest PR diff and suggest improvements before you merge.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-github</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Postgres — SQL queries against a live database</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Runs read-only SQL queries against a PostgreSQL database and returns results as plain text. Claude can inspect schema, write and explain queries, and translate business questions into SQL.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Hand Claude an unfamiliar schema and ask it to explain each table in plain English.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">04</div><div class="card-title">Brave Search — real-time web results</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Queries the Brave Search API for live web results. Claude gets titles, URLs, and descriptions — then synthesizes them into a structured answer. Requires a free Brave API key.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Research a topic and have Claude synthesize results from multiple sources in one response.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-brave-search</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">05</div><div class="card-title">Puppeteer — browser automation and scraping</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Controls a headless Chrome instance. Claude can navigate pages, click elements, wait for dynamic content, take screenshots, and extract structured data from any website.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Scrape a product page for pricing data, or screenshot a dashboard for a weekly report.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-puppeteer</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">06</div><div class="card-title">Slack — messages, channels, and users</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Send and read messages, list channels, look up users, and post to Slack workspaces. Requires a Slack bot token and team ID set as environment variables.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude monitor a support channel and draft responses to common questions.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-slack</code>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left"><div class="card-num">07</div><div class="card-title">Fetch — retrieve content from any URL</div></div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">
+                Fetches raw HTML or text from any public URL without opening a browser. Useful for pulling in documentation pages, RSS feeds, or plain-text files directly into your conversation.<br><br>
+                <strong style="color:var(--text-mid)">Classroom use:</strong> Point Claude at an API docs page and ask it to write a client based on what it reads.<br><br>
+                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-fetch</code>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
