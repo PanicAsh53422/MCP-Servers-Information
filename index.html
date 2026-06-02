@@ -324,7 +324,7 @@
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .step-content { flex: 1; }
+    .step-content { flex: 1; min-width: 0; }
     .step-title {
       font-size: 13px; font-weight: 600;
       color: var(--text-primary);
@@ -348,6 +348,38 @@
       white-space: pre;
       overflow-x: auto;
       display: block;
+    }
+    /* ── Tab Switcher ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-code);
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: var(--accent-light); border-color: rgba(56,189,248,0.2); }
+    .tab-btn.active {
+      background: rgba(56,189,248,0.1);
+      border-color: rgba(56,189,248,0.3);
+      color: var(--accent);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .code-block-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
     }
   </style>
 </head>
@@ -721,6 +753,85 @@
                 <div class="step-title">Verify it's working</div>
                 <div class="step-desc">Open a new conversation and type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see a tool-use indicator appear in the chat.</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider" />
+
+        <!-- ── Section 7: Code Examples ── -->
+        <section class="section" id="code-examples">
+          <div class="section-eyebrow">Section 07</div>
+          <div class="section-title">Code <span>Examples</span></div>
+          <div class="section-desc">
+            A minimal MCP server with one tool: <code style="font-family:var(--font-code);color:var(--accent);font-size:12px">search_web(query)</code>. It calls the Brave Search API and returns the top five results. Pick your language — the structure is identical in both.
+          </div>
+          <div class="tab-group">
+            <div class="tabs">
+              <button class="tab-btn active" data-lang="python">Python</button>
+              <button class="tab-btn" data-lang="typescript">TypeScript</button>
+            </div>
+            <div class="tab-panel active" data-lang="python">
+              <div class="code-block-label">Install: pip install mcp httpx</div>
+              <code class="code-block">import httpx
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("brave-search")
+
+BRAVE_API_KEY = "your-api-key-here"
+
+@mcp.tool()
+def search_web(query: str) -> str:
+    """Search the web using Brave Search and return top 5 results."""
+    response = httpx.get(
+        "https://api.search.brave.com/res/v1/web/search",
+        headers={"X-Subscription-Token": BRAVE_API_KEY},
+        params={"q": query, "count": 5},
+    )
+    results = response.json().get("web", {}).get("results", [])
+    return "\n\n".join(
+        f"{r['title']}\n{r['url']}\n{r.get('description', '')}"
+        for r in results
+    )
+
+if __name__ == "__main__":
+    mcp.run()</code>
+            </div>
+            <div class="tab-panel" data-lang="typescript">
+              <div class="code-block-label">Install: npm install @modelcontextprotocol/sdk zod</div>
+              <code class="code-block">import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const BRAVE_API_KEY = "your-api-key-here";
+
+const server = new McpServer({ name: "brave-search", version: "1.0.0" });
+
+server.tool(
+  "search_web",
+  "Search the web using Brave Search and return top 5 results.",
+  { query: z.string().describe("The search query") },
+  async ({ query }) => {
+    const url = new URL("https://api.search.brave.com/res/v1/web/search");
+    url.searchParams.set("q", query);
+    url.searchParams.set("count", "5");
+
+    const res = await fetch(url.toString(), {
+      headers: { "X-Subscription-Token": BRAVE_API_KEY },
+    });
+    const data = await res.json();
+    const results = data?.web?.results ?? [];
+
+    const text = results
+      .map((r) => `${r.title}\n${r.url}\n${r.description ?? ""}`)
+      .join("\n\n");
+
+    return { content: [{ type: "text", text }] };
+  }
+);
+
+const transport = new StdioServerTransport();
+await server.connect(transport);</code>
             </div>
           </div>
         </section>
