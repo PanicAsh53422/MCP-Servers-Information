@@ -302,6 +302,53 @@
       padding-top: 14px;
     }
     .card.open .card-body { display: block; }
+
+    /* ── Step Guide ── */
+    .steps { display: flex; flex-direction: column; }
+    .step {
+      display: flex;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(56,189,248,0.08);
+      border: 1px solid rgba(56,189,248,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-code);
+      font-size: 11px; font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .code-block {
+      background: rgba(2,6,15,0.85);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-family: var(--font-code);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--accent-light);
+      white-space: pre;
+      overflow-x: auto;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -605,6 +652,74 @@
                 <strong style="color:var(--text-mid)">Problem:</strong> New GitHub issues pile up and it takes time to triage them, assign labels, and notify the team.<br><br>
                 <strong style="color:var(--text-mid)">Servers:</strong> GitHub + Slack<br><br>
                 Claude reads open issues, categorizes them by type (bug, feature, question), posts a triage summary to a Slack channel, and suggests label assignments — in one prompt.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider" />
+
+        <!-- ── Section 6: Getting Started ── -->
+        <section class="section" id="getting-started">
+          <div class="section-eyebrow">Section 06</div>
+          <div class="section-title">Getting <span>Started</span></div>
+          <div class="section-desc">
+            Connect an MCP server to Claude Desktop in five steps. We'll use the Filesystem server as the example — it requires no API key and works immediately.
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">Download Claude Desktop</div>
+                <div class="step-desc">Install Claude Desktop from anthropic.com. Available for macOS and Windows. This is the host application that manages your MCP connections.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">Open the config file</div>
+                <div class="step-desc">
+                  The config file location depends on your OS. If the file doesn't exist yet, create it.<br><br>
+                  <strong style="color:var(--text-mid)">macOS</strong>
+                  <code class="code-block">~/Library/Application Support/Claude/claude_desktop_config.json</code>
+                  <strong style="color:var(--text-mid)">Windows</strong>
+                  <code class="code-block">%APPDATA%\Claude\claude_desktop_config.json</code>
+                </div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-title">Add a server entry</div>
+                <div class="step-desc">
+                  Paste the following into your config file. Replace <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">/Users/yourname/Documents</code> with an actual folder path on your machine.
+                  <code class="code-block">{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/yourname/Documents"
+      ]
+    }
+  }
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <div class="step-title">Restart Claude Desktop</div>
+                <div class="step-desc">Fully quit and relaunch Claude Desktop. The config file is only read on startup — changes won't take effect until you restart.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-content">
+                <div class="step-title">Verify it's working</div>
+                <div class="step-desc">Open a new conversation and type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see a tool-use indicator appear in the chat.</div>
               </div>
             </div>
           </div>
