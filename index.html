@@ -364,7 +364,7 @@
       color: var(--text-muted);
       cursor: pointer;
       font-family: var(--font-code);
-      transition: all 0.2s ease;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
     .tab-btn:hover { color: var(--accent-light); border-color: rgba(56,189,248,0.2); }
     .tab-btn.active {
@@ -395,7 +395,7 @@
       <div class="sidebar-stats">
         <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Sections</div></div>
         <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Languages</div></div>
-        <div class="stat"><div class="stat-num">12+</div><div class="stat-lbl">Servers</div></div>
+        <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Servers</div></div>
       </div>
 
       <nav class="sidebar-nav">
@@ -831,7 +831,7 @@ server.tool(
 );
 
 const transport = new StdioServerTransport();
-await server.connect(transport);</code>
+await server.connect(transport); // requires "type":"module" in package.json</code>
             </div>
           </div>
         </section>
@@ -851,6 +851,30 @@ await server.connect(transport);</code>
       });
     }
     initAccordion();
+
+    // Tab switcher
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = btn.closest('.tab-group');
+        group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        group.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        group.querySelector(`.tab-panel[data-lang="${btn.dataset.lang}"]`).classList.add('active');
+      });
+    });
+
+    // Scroll-spy
+    const navItems = document.querySelectorAll('.nav-item[data-section]');
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navItems.forEach(item => item.classList.remove('active'));
+          const hit = document.querySelector(`.nav-item[data-section="${entry.target.id}"]`);
+          if (hit) hit.classList.add('active');
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
   </script>
 </body>
 </html>
