@@ -231,6 +231,77 @@
       border-top: 1px solid var(--border);
       margin: 0 0 56px;
     }
+
+    /* ── Expandable Cards ── */
+    .cards { display: flex; flex-direction: column; gap: 6px; }
+    .card {
+      background: linear-gradient(135deg, rgba(10,22,40,0.9) 0%, rgba(4,10,22,0.9) 100%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      border-color: rgba(56,189,248,0.22);
+      box-shadow: 0 0 24px rgba(56,189,248,0.06), 0 6px 20px rgba(0,0,0,0.35);
+      transform: translateX(3px);
+    }
+    .card.open {
+      border-color: rgba(56,189,248,0.28);
+      box-shadow: 0 0 30px rgba(56,189,248,0.09), 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .card-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .card-header-left { display: flex; align-items: center; gap: 10px; }
+    .card-num {
+      width: 24px; height: 24px;
+      border-radius: 5px;
+      background: rgba(56,189,248,0.08);
+      border: 1px solid rgba(56,189,248,0.16);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-code);
+      font-size: 9px; font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .card.open .card-num {
+      background: rgba(56,189,248,0.14);
+      box-shadow: 0 0 10px rgba(56,189,248,0.18);
+    }
+    .card-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-mid);
+      transition: color 0.2s;
+    }
+    .card.open .card-title { color: var(--text-primary); }
+    .card-chevron {
+      font-size: 10px;
+      color: var(--text-dim);
+      transition: transform 0.25s ease, color 0.25s ease;
+      flex-shrink: 0;
+    }
+    .card.open .card-chevron {
+      transform: rotate(90deg);
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(56,189,248,0.5);
+    }
+    .card-body {
+      display: none;
+      padding: 0 16px 16px 50px;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.8;
+      border-top: 1px solid rgba(56,189,248,0.05);
+      padding-top: 14px;
+    }
+    .card.open .card-body { display: block; }
   </style>
 </head>
 <body>
@@ -269,13 +340,45 @@
         <section class="section" id="what-is-mcp">
           <div class="section-eyebrow">Section 01</div>
           <div class="section-title">What is <span>MCP</span>?</div>
-          <div class="section-desc">Content coming in the next task.</div>
+          <div class="section-desc">Placeholder — real content next task.</div>
+          <div class="cards">
+            <div class="card open">
+              <div class="card-header">
+                <div class="card-header-left">
+                  <div class="card-num">01</div>
+                  <div class="card-title">Test card — click to close</div>
+                </div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">This card body is visible because the card starts open. Click the card to close it, then click again to reopen.</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left">
+                  <div class="card-num">02</div>
+                  <div class="card-title">Test card — click to open</div>
+                </div>
+                <div class="card-chevron">▶</div>
+              </div>
+              <div class="card-body">Opening this card should close card 01 above.</div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
   </div>
   <script>
-    // JS goes here in later tasks
+    // Accordion — one card open at a time globally
+    function initAccordion() {
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+          const isOpen = card.classList.contains('open');
+          document.querySelectorAll('.card.open').forEach(c => c.classList.remove('open'));
+          if (!isOpen) card.classList.add('open');
+        });
+      });
+    }
+    initAccordion();
   </script>
 </body>
 </html>
