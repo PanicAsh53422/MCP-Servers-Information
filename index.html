@@ -43,11 +43,156 @@
       display: flex;
       min-height: 100vh;
     }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    /* Ambient glow rising from sidebar bottom */
+    .sidebar::after {
+      content: '';
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 220px; height: 180px;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(56,189,248,0.07) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sidebar-brand {
+      padding: 24px 18px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-eyebrow {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .brand-name {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 5px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 40%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand-tagline {
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .sidebar-stats {
+      display: flex;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 2px;
+    }
+    .stat { flex: 1; text-align: center; padding: 6px 4px; }
+    .stat-num { font-size: 16px; font-weight: 800; color: var(--accent); line-height: 1; }
+    .stat-lbl { font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .sidebar-nav { padding: 10px 8px; flex: 1; }
+    .nav-group-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--border-mid);
+      padding: 0 8px;
+      margin: 12px 0 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 1px;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.2s ease;
+      border-left: 2px solid transparent;
+    }
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0; width: 0;
+      background: linear-gradient(90deg, rgba(56,189,248,0.12), transparent);
+      transition: width 0.2s ease;
+    }
+    .nav-item:hover { color: var(--accent-light); }
+    .nav-item:hover::before { width: 100%; }
+    .nav-item.active {
+      color: var(--accent);
+      font-weight: 600;
+      border-left-color: var(--accent);
+      background: linear-gradient(90deg, rgba(56,189,248,0.08) 0%, transparent 100%);
+      text-shadow: 0 0 12px rgba(56,189,248,0.35);
+    }
+    .nav-icon {
+      font-size: 11px;
+      width: 16px;
+      text-align: center;
+      opacity: 0.7;
+      position: relative;
+      z-index: 1;
+    }
+    .nav-item span, .nav-item:not(.nav-icon) { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
   <div class="layout">
-    <!-- sidebar and main go here in later tasks -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-eyebrow">Dixie Tech · AI Division</div>
+        <div class="brand-name">MCP<br>Servers</div>
+        <div class="brand-tagline">Model Context Protocol</div>
+      </div>
+
+      <div class="sidebar-stats">
+        <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Sections</div></div>
+        <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Languages</div></div>
+        <div class="stat"><div class="stat-num">12+</div><div class="stat-lbl">Servers</div></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group-label">Concepts</div>
+        <a href="#what-is-mcp"       class="nav-item" data-section="what-is-mcp"><span class="nav-icon">◈</span>What is MCP</a>
+        <a href="#how-it-works"      class="nav-item" data-section="how-it-works"><span class="nav-icon">⬡</span>How it Works</a>
+        <a href="#core-capabilities" class="nav-item" data-section="core-capabilities"><span class="nav-icon">⬢</span>Core Capabilities</a>
+
+        <div class="nav-group-label">Reference</div>
+        <a href="#popular-servers"   class="nav-item" data-section="popular-servers"><span class="nav-icon">◎</span>Popular Servers</a>
+        <a href="#use-cases"         class="nav-item" data-section="use-cases"><span class="nav-icon">◇</span>Use Cases</a>
+
+        <div class="nav-group-label">Hands-on</div>
+        <a href="#getting-started"   class="nav-item" data-section="getting-started"><span class="nav-icon">▷</span>Getting Started</a>
+        <a href="#code-examples"     class="nav-item" data-section="code-examples"><span class="nav-icon">〈/〉</span>Code Examples</a>
+      </nav>
+    </aside>
+
+    <main class="main" id="main">
+      <!-- sections go here -->
+    </main>
   </div>
   <script>
     // JS goes here in later tasks
