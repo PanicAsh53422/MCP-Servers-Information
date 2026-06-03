@@ -1219,9 +1219,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                <strong style="color:var(--text-mid)">Host</strong> — the application the user runs (e.g. Claude Desktop, Cursor). It manages the user session and holds one or more clients.<br><br>
-                <strong style="color:var(--text-mid)">Client</strong> — lives inside the host; maintains a 1:1 connection with one MCP server. Forwards tool calls from the model to the server.<br><br>
-                <strong style="color:var(--text-mid)">Server</strong> — a separate process (or remote service) that exposes tools, resources, and prompts. You build this.
+                <strong style="color:var(--text-mid)">Host</strong> — the application the user runs (e.g. Claude Desktop, Cursor). It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this — you use it.<br><br>
+                <strong style="color:var(--text-mid)">Client</strong> — lives inside the host; maintains a 1:1 connection with one MCP server. Forwards tool calls from the model to the server and routes results back. Also handled for you by the host app.<br><br>
+                <strong style="color:var(--text-mid)">Server</strong> — a separate process (or remote service) that exposes tools, resources, and prompts. This is what you build. A server can be as small as 30 lines of Python or TypeScript, and it runs independently of whatever AI client the user has.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> As a developer, your job is the server — the host and client are handled by whatever AI app the user is already running.</div>
               </div>
             </div>
             <div class="card">
@@ -1230,8 +1231,9 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                <strong style="color:var(--text-mid)">stdio</strong> — the host spawns your server as a child process and communicates over stdin/stdout. Used for local servers. Simple, no networking required.<br><br>
-                <strong style="color:var(--text-mid)">HTTP + SSE</strong> — server runs as an HTTP service; client connects via Server-Sent Events for streaming. Used for remote or shared servers.
+                <strong style="color:var(--text-mid)">stdio</strong> — the host launches your server as a child process and communicates through stdin/stdout. Used for local servers running on the same machine. Zero networking setup: no ports, no auth, no firewall rules. This is what you'll use for development and most practical work.<br><br>
+                <strong style="color:var(--text-mid)">HTTP + SSE</strong> — your server runs as a regular HTTP service; the client connects via Server-Sent Events for streaming responses. Use this when the server needs to run remotely (a deployed API, a shared team tool) or when multiple users need access to the same server simultaneously.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Start with stdio — it's local, needs no config, and works immediately. Switch to HTTP+SSE only when you need remote or shared access.</div>
               </div>
             </div>
             <div class="card">
@@ -1240,12 +1242,16 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
+                When a user sends a message, here's what happens under the hood:<br><br>
                 1. User sends a message to the AI.<br>
-                2. Model decides a tool call is needed and emits a tool-call request.<br>
-                3. Client routes the request to the appropriate MCP server.<br>
-                4. Server executes the tool and returns a result.<br>
-                5. Result is injected back into the model's context.<br>
-                6. Model generates a final response using the result.
+                2. Model reads the full list of available tools from all connected servers.<br>
+                3. Model decides a tool call is needed and emits a structured tool-call request.<br>
+                4. Client routes the request to the correct MCP server.<br>
+                5. Server executes the tool and returns a result.<br>
+                6. Result is injected back into the model's context as a new message.<br>
+                7. Model generates a final response using the result.<br><br>
+                Your server only ever handles step 5 — it receives a validated call and returns a result. The model, host, and client handle everything else.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Your server handles one step — receive a tool call, return a result. Everything else is managed by the client and host.</div>
               </div>
             </div>
           </div>
