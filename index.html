@@ -354,15 +354,22 @@
     }
 
     .card-body {
-      display: none;
-      padding: 0 22px 22px 66px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      padding: 0 22px 0 66px;
       border-top: 1px solid var(--line-soft);
       color: var(--text-mid);
       font-size: 15px;
       line-height: 1.78;
+      transition: max-height 0.35s ease, opacity 0.22s ease, padding 0.35s ease;
     }
 
-    .card.open .card-body { display: block; }
+    .card.open .card-body {
+      max-height: 800px;
+      opacity: 1;
+      padding: 0 22px 22px 66px;
+    }
 
     .steps {
       position: relative;
