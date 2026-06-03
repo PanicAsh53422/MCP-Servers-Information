@@ -1186,7 +1186,7 @@
                 <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Why does MCP exist?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. If you wanted Claude to read your files, you built a custom integration. If you wanted it to query your database, you built another one that shared nothing with the first. MCP standardizes how models discover and invoke tools. A server written once works with any MCP-compatible client: Claude Desktop, Cursor, VS Code, Continue, Zed, and more. If you're already building software with AI, MCP is the layer that lets your AI actually take actions in your environment, not just talk about them.<div class="card-takeaway"><strong>Key takeaway:</strong> Write the server once; every MCP-compatible AI client can use it without any changes.</div></div>
+              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. If you wanted Claude to read your files, you built a custom integration. If you wanted it to query your database, you built another one that shared nothing with the first. MCP standardizes how models discover and invoke tools. A server written once works with any MCP-compatible client: Claude CLI, Claude Desktop, Cursor, VS Code, Continue, Zed, and more. If you're already building software with AI, MCP is the layer that lets your AI actually take actions in your environment, not just talk about them.<div class="card-takeaway"><strong>Key takeaway:</strong> Write the server once; every MCP-compatible AI client can use it without any changes.</div></div>
             </div>
             <div class="card">
               <div class="card-header">
@@ -1221,7 +1221,7 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                <strong style="color:var(--text-mid)">Host:</strong> the application the user runs (e.g. Claude Desktop, Cursor). It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
+                <strong style="color:var(--text-mid)">Host:</strong> the application the user runs (e.g. Claude CLI, Claude Desktop, Cursor). It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
                 <strong style="color:var(--text-mid)">Client:</strong> lives inside the host. Maintains a 1:1 connection with one MCP server, forwards tool calls from the model to the server, and routes results back. Also handled for you by the host app.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> a separate process (or remote service) that exposes tools, resources, and prompts. This is what you build. A server can be 30 lines of Python or TypeScript. It runs independently of whatever AI client the user has.
                 <div class="card-takeaway"><strong>Key takeaway:</strong> As a developer, your job is the server. The host and client are handled by whatever AI app the user is already running.</div>
@@ -1288,7 +1288,7 @@
                 <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Prompts: reusable prompt templates</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">A server can expose named prompt templates with dynamic arguments, like a function that returns a pre-filled conversation starter. The host can surface these as slash-commands or quick actions in the UI (Claude Desktop shows them in the <code>/</code> menu). Prompts make sense when you've got a repeated workflow that always starts the same way: "review this PR", "explain this error log", "summarize this week's issues". They're the least-used of the three primitives. Most servers never define any. Get comfortable building tools first; come back to prompts when you have a concrete repeated workflow to standardize.<div class="card-takeaway"><strong>Key takeaway:</strong> Prompts are optional and uncommon. Master tools first, then revisit these when you have a concrete repeated workflow.</div></div>
+              <div class="card-body">A server can expose named prompt templates with dynamic arguments, like a function that returns a pre-filled conversation starter. The host can surface these as slash-commands or quick actions in the UI (Claude CLI surfaces them when you type <code>/</code>). Prompts make sense when you've got a repeated workflow that always starts the same way: "review this PR", "explain this error log", "summarize this week's issues". They're the least-used of the three primitives. Most servers never define any. Get comfortable building tools first; come back to prompts when you have a concrete repeated workflow to standardize.<div class="card-takeaway"><strong>Key takeaway:</strong> Prompts are optional and uncommon. Master tools first, then revisit these when you have a concrete repeated workflow.</div></div>
             </div>
           </div>
         </section>
@@ -1470,92 +1470,61 @@
           <div class="section-eyebrow">Section 06</div>
           <div class="section-title">Getting <span>Started</span></div>
           <div class="section-desc">
-            Connect an MCP server to Claude Desktop in six steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately.
+            Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately.
           </div>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
               <div class="step-content">
-                <div class="step-title">Download Claude Desktop</div>
-                <div class="step-desc">Install Claude Desktop from anthropic.com. It's available for macOS and Windows. This is the host app that manages your MCP connections.</div>
+                <div class="step-title">Install Claude CLI</div>
+                <div class="step-desc">If you haven't already, install Claude CLI via npm. This is the host that manages your MCP connections.
+                  <code class="code-block">npm install -g @anthropic-ai/claude-code</code>
+                  Then log in:
+                  <code class="code-block">claude</code>
+                  Follow the prompts to authenticate with your Anthropic account.
+                </div>
               </div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
               <div class="step-content">
-                <div class="step-title">Open the config file</div>
+                <div class="step-title">Add the Filesystem server</div>
                 <div class="step-desc">
-                  The config file location depends on your OS. If it doesn't exist yet, create it.<br><br>
-                  <strong style="color:var(--text-mid)">macOS</strong>
-                  <code class="code-block">~/Library/Application Support/Claude/claude_desktop_config.json</code>
-                  <strong style="color:var(--text-mid)">Windows</strong>
-                  <code class="code-block">%APPDATA%\Claude\claude_desktop_config.json</code>
+                  Run this command to connect the Filesystem server. Replace <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">~/Documents</code> with the folder you want Claude to access.
+                  <code class="code-block">claude mcp add filesystem npx -y @modelcontextprotocol/server-filesystem ~/Documents</code>
+                  That's it. No config file to edit, no restart needed.
                 </div>
               </div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
               <div class="step-content">
-                <div class="step-title">Add a server entry</div>
+                <div class="step-title">Handle API keys</div>
                 <div class="step-desc">
-                  Paste the following into your config file. Replace <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">/Users/yourname/Documents</code> with a real folder path on your machine.
-                  <code class="code-block">{
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/Users/yourname/Documents"
-      ]
-    }
-  }
-}</code>
+                  Some servers need an API key. Pass them with the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">-e</code> flag — never hardcode them in the command itself.
+                  <code class="code-block">claude mcp add brave-search -e BRAVE_API_KEY=your-key-here npx -y @modelcontextprotocol/server-brave-search</code>
+                  <strong style="color:var(--text-mid)">Where to get keys for common servers</strong><br>
+                  <strong>GitHub:</strong> github.com → Settings → Developer settings → Personal access tokens → Tokens (classic). Select the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">repo</code> scope.<br>
+                  <strong>Brave Search:</strong> brave.com/search/api. Free tier includes 2,000 queries/month.<br>
+                  <strong>Slack:</strong> api.slack.com/apps. Create an app, install it to your workspace, and copy the Bot User OAuth Token.
                 </div>
               </div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
               <div class="step-content">
-                <div class="step-title">Handle API keys</div>
+                <div class="step-title">Verify it's working</div>
                 <div class="step-desc">
-                  Some MCP servers need an API key to authenticate with an external service. Pass keys using the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">env</code> field in your server config. Never hardcode them inside <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">args</code>.<br><br>
-                  <strong style="color:var(--text-mid)">Config pattern with an API key</strong>
-                  <code class="code-block">{
-  "mcpServers": {
-    "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-      "env": {
-        "BRAVE_API_KEY": "your-key-here"
-      }
-    }
-  }
-}</code>
-                  <br><strong style="color:var(--text-mid)">Where to get keys for common servers</strong><br>
-                  <strong>GitHub:</strong> github.com → Settings → Developer settings → Personal access tokens → Tokens (classic). Select the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">repo</code> scope.<br>
-                  <strong>Brave Search:</strong> brave.com/search/api. Free tier includes 2,000 queries/month.<br>
-                  <strong>Slack:</strong> api.slack.com/apps. Create an app, install it to your workspace, and copy the Bot User OAuth Token.<br><br>
-                  <strong style="color:var(--text-mid)">Heads up:</strong> your config file contains your API keys in plain text. Don't commit it to git. Add the config path to your <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">.gitignore</code> or keep keys in a separate secrets file.
+                  Check your connected servers:
+                  <code class="code-block">claude mcp list</code>
+                  You should see <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">filesystem</code> listed. Then start a chat and test it:
+                  <code class="code-block">claude</code>
+                  Type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see the tool call appear inline before the response.
                 </div>
               </div>
             </div>
-            <div class="step">
-              <div class="step-num">5</div>
-              <div class="step-content">
-                <div class="step-title">Restart Claude Desktop</div>
-                <div class="step-desc">Fully quit and relaunch Claude Desktop. Don't just close the window. On macOS, use Cmd+Q or right-click the dock icon and choose Quit. On Windows, right-click the system tray icon and choose Exit. The config file is only read on startup, so your changes won't take effect until you do a full restart.</div>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">6</div>
-              <div class="step-content">
-                <div class="step-title">Verify it's working</div>
-                <div class="step-desc">Open a new conversation and type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see a small tool-use indicator above Claude's response: a collapsible row showing the tool name and its inputs. If nothing happens or you get an error, double-check that the config file path is correct and that you fully quit and relaunched (not just closed the window).</div>
-              </div>
-            </div>
           </div>
-          <div class="section-takeaway"><strong>Key takeaway:</strong> Once you've done this once, adding new servers is just one config block and a restart. The pattern is always the same.</div>
+          <div class="section-takeaway"><strong>Key takeaway:</strong> Once you've done this once, adding new servers is just one <code style="font-family:var(--font-code);color:var(--accent-2);font-size:12px">claude mcp add</code> command. The pattern never changes.</div>
         </section>
 
         <hr class="section-divider" />
