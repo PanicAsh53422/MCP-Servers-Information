@@ -1563,7 +1563,7 @@
           <div class="section-eyebrow">Section 07</div>
           <div class="section-title">Code <span>Examples</span></div>
           <div class="section-desc">
-            A minimal MCP server with one tool: <code style="font-family:var(--font-code);color:var(--accent);font-size:12px">search_web(query)</code>. It calls the Brave Search API and returns the top five results. Pick your language — the structure is identical in both.
+            A minimal MCP server with one tool: <code style="font-family:var(--font-code);color:var(--accent);font-size:12px">search_web(query)</code>. It calls the Brave Search API and returns the top five results. Pick your language — the structure is identical in both. Every MCP server follows three steps: <strong>(1)</strong> instantiate a server with a name, <strong>(2)</strong> register one or more tools with a name, description, and input schema, <strong>(3)</strong> connect a transport and run. The description you write for a tool is what the model reads to decide when to call it — write it like a clear function comment.
           </div>
           <div class="tab-group">
             <div class="tabs">
@@ -1635,6 +1635,7 @@ const transport = new StdioServerTransport();
 await server.connect(transport); // requires "type":"module" in package.json</code>
             </div>
           </div>
+          <div class="section-takeaway"><strong>Key takeaway:</strong> Every MCP server follows the same three-part structure — instantiate, register tools, connect transport. Swap in different tool logic and it works for any use case.</div>
         </section>
 
       </div>
