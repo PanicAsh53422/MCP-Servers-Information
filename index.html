@@ -639,7 +639,7 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You need to research a topic across multiple sources and synthesize findings without copy-pasting from tab to tab.<br><br>
                 <strong style="color:var(--text-mid)">Servers:</strong> Brave Search + Fetch<br><br>
-                Claude searches the web for your query, fetches the full text of the top results, and returns a structured summary with citations — all in one response.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude searches the web for your query, fetches the full text of the top results, and returns a structured summary with citations — all in one response.
               </div>
             </div>
             <div class="card">
@@ -650,7 +650,7 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You want AI feedback on a pull request without pasting the whole diff into a chat window.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> GitHub<br><br>
-                Claude fetches the PR diff directly from GitHub, reads the changed files, and returns structured review comments organized by file — pointing to specific lines.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude fetches the PR diff directly from GitHub, reads the changed files, and returns structured review comments organized by file — pointing to specific lines.
               </div>
             </div>
             <div class="card">
@@ -661,7 +661,7 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> A teammate handed you a Postgres database with no documentation and you need to understand it fast.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> Postgres<br><br>
-                Claude queries the schema, describes each table in plain English, maps out the relationships, and answers questions like "which table tracks user sessions?" without you writing a single query.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude queries the schema, describes each table in plain English, maps out the relationships, and answers questions like "which table tracks user sessions?" without you writing a single query.
               </div>
             </div>
             <div class="card">
@@ -672,7 +672,7 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You need structured data from a website that doesn't offer an API.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> Puppeteer<br><br>
-                Claude navigates to the page, waits for dynamic content to load, extracts the data you describe (prices, names, dates), and returns it as a clean table ready to copy into a spreadsheet.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude navigates to the page, waits for dynamic content to load, extracts the data you describe (prices, names, dates), and returns it as a clean table ready to copy into a spreadsheet.
               </div>
             </div>
             <div class="card">
@@ -683,7 +683,7 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> New GitHub issues pile up and it takes time to triage them, assign labels, and notify the team.<br><br>
                 <strong style="color:var(--text-mid)">Servers:</strong> GitHub + Slack<br><br>
-                Claude reads open issues, categorizes them by type (bug, feature, question), posts a triage summary to a Slack channel, and suggests label assignments — in one prompt.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude reads open issues, categorizes them by type (bug, feature, question), posts a triage summary to a Slack channel, and suggests label assignments — in one prompt.
               </div>
             </div>
           </div>
@@ -768,8 +768,8 @@
           </div>
           <div class="tab-group">
             <div class="tabs">
-              <button class="tab-btn active" data-lang="python">Python</button>
-              <button class="tab-btn" data-lang="typescript">TypeScript</button>
+              <button type="button" class="tab-btn active" data-lang="python">Python</button>
+              <button type="button" class="tab-btn" data-lang="typescript">TypeScript</button>
             </div>
             <div class="tab-panel active" data-lang="python">
               <div class="code-block-label">Install: pip install mcp httpx</div>
@@ -788,6 +788,7 @@ def search_web(query: str) -> str:
         headers={"X-Subscription-Token": BRAVE_API_KEY},
         params={"q": query, "count": 5},
     )
+    response.raise_for_status()
     results = response.json().get("web", {}).get("results", [])
     return "\n\n".join(
         f"{r['title']}\n{r['url']}\n{r.get('description', '')}"
@@ -819,6 +820,7 @@ server.tool(
     const res = await fetch(url.toString(), {
       headers: { "X-Subscription-Token": BRAVE_API_KEY },
     });
+    if (!res.ok) return { content: [{ type: "text", text: `Error: ${res.status} ${res.statusText}` }] };
     const data = await res.json();
     const results = data?.web?.results ?? [];
 
@@ -873,7 +875,7 @@ await server.connect(transport); // requires "type":"module" in package.json</co
           if (hit) hit.classList.add('active');
         }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0, rootMargin: "-40% 0px -55% 0px" });
     document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
   </script>
 </body>
