@@ -1515,18 +1515,45 @@
             <div class="step">
               <div class="step-num">4</div>
               <div class="step-content">
-                <div class="step-title">Restart Claude Desktop</div>
-                <div class="step-desc">Fully quit and relaunch Claude Desktop. The config file is only read on startup — changes won't take effect until you restart.</div>
+                <div class="step-title">Handle API keys</div>
+                <div class="step-desc">
+                  Some MCP servers need an API key to authenticate with an external service. Pass keys using the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">env</code> field in your server config — never hardcode them inside <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">args</code>.<br><br>
+                  <strong style="color:var(--text-mid)">Config pattern with an API key</strong>
+                  <code class="code-block">{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-key-here"
+      }
+    }
+  }
+}</code>
+                  <strong style="color:var(--text-mid)">Where to get keys for common servers</strong><br>
+                  <strong>GitHub</strong> — github.com → Settings → Developer settings → Personal access tokens → Tokens (classic). Select the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">repo</code> scope.<br>
+                  <strong>Brave Search</strong> — brave.com/search/api — free tier includes 2,000 queries/month.<br>
+                  <strong>Slack</strong> — api.slack.com/apps — create an app, install it to your workspace, copy the Bot User OAuth Token.<br><br>
+                  <strong style="color:var(--text-mid)">Important:</strong> your config file contains your API keys in plain text. Never commit it to git. Add the config path to your <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">.gitignore</code> or keep keys in a separate secrets file.
+                </div>
               </div>
             </div>
             <div class="step">
               <div class="step-num">5</div>
               <div class="step-content">
+                <div class="step-title">Restart Claude Desktop</div>
+                <div class="step-desc">Fully quit and relaunch Claude Desktop — don't just close the window. On macOS, use Cmd+Q or right-click the dock icon and choose Quit. On Windows, right-click the system tray icon and choose Exit. The config file is only read on startup, so changes won't take effect until you do a full restart.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div class="step-content">
                 <div class="step-title">Verify it's working</div>
-                <div class="step-desc">Open a new conversation and type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see a tool-use indicator appear in the chat.</div>
+                <div class="step-desc">Open a new conversation and type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see a small tool-use indicator — a collapsible row showing the tool name and its inputs — appear above Claude's response. If nothing happens or you get an error, double-check that the config file path is correct and that you fully quit and relaunched (not just closed the window).</div>
               </div>
             </div>
           </div>
+          <div class="section-takeaway"><strong>Key takeaway:</strong> Once you've done this once, adding new servers is just one config block and a restart — the pattern is always the same.</div>
         </section>
 
         <hr class="section-divider" />
