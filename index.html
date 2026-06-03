@@ -1307,9 +1307,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                The simplest MCP server. Gives Claude access to a directory you specify — it can list, read, write, and search files within it. Great starting point for understanding how MCP tools work.<br><br>
+                The simplest MCP server and the best one to start with. You give it a directory path in the config and Claude gets read/write access to every file inside it — list directories, read file contents, write new files, search by name or content. It's sandboxed to the folder you specify, so you control exactly what Claude can touch. Because it uses only stdio and requires no API key, it's the easiest way to confirm your MCP setup is working before moving on to more complex servers.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude read your notes folder and summarize what you worked on this week.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-filesystem /path/to/folder</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Use this first when learning MCP — no API key needed, and getting it working proves your entire setup is correct.</div>
               </div>
             </div>
             <div class="card">
@@ -1318,9 +1319,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Search repositories, read file contents, list and create pull requests, open issues, and post comments — all without leaving Claude. Requires a GitHub personal access token.<br><br>
+                Search repositories, read file contents, list and create pull requests, open issues, post comments, and browse commit history — all from inside Claude. Because it talks directly to the GitHub API, it works on any repo you have access to, public or private. Requires a GitHub personal access token with <code>repo</code> scope — see the API Keys step in Getting Started for how to add it to your config. Once connected, you can ask Claude to review a PR, explain a commit, or draft an issue description without switching apps.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Ask Claude to review your latest PR diff and suggest improvements before you merge.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-github</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> If you only set up one server beyond Filesystem, make it GitHub — it fits directly into the workflow you already have.</div>
               </div>
             </div>
             <div class="card">
@@ -1329,9 +1331,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Runs read-only SQL queries against a PostgreSQL database and returns results as plain text. Claude can inspect schema, write and explain queries, and translate business questions into SQL.<br><br>
+                Runs read-only SQL queries against a PostgreSQL database and returns results as plain text. Claude can inspect your schema, write queries from plain-English descriptions, explain what existing queries do, and answer questions about your data without you writing a line of SQL. The connection string in your config acts as the credentials — Claude only gets the permissions that connection has, so a read-only user keeps things safe. Useful for learning a new codebase's data model fast, or exploring a database you didn't build.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Hand Claude an unfamiliar schema and ask it to explain each table in plain English.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Point Claude at a database and ask questions in plain English — no SQL experience required.</div>
               </div>
             </div>
             <div class="card">
@@ -1340,9 +1343,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Queries the Brave Search API for live web results. Claude gets titles, URLs, and descriptions — then synthesizes them into a structured answer. Requires a free Brave API key.<br><br>
+                Queries the Brave Search API for live, real-time web results — bypassing Claude's training cutoff. Claude gets page titles, URLs, and descriptions, then synthesizes them into a structured answer. Requires a free Brave Search API key (see the API Keys step in Getting Started). Combine it with the Fetch server for a full research workflow: search returns the URLs, Fetch retrieves the full page text, Claude synthesizes everything into one response.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Research a topic and have Claude synthesize results from multiple sources in one response.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-brave-search</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Use this when you need Claude to work with information that's newer than its training data.</div>
               </div>
             </div>
             <div class="card">
@@ -1351,9 +1355,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Controls a headless Chrome instance. Claude can navigate pages, click elements, wait for dynamic content, take screenshots, and extract structured data from any website.<br><br>
+                Controls a full headless Chrome browser, not just a plain HTTP fetcher. Claude can navigate to URLs, click buttons, fill forms, wait for JavaScript to finish rendering, take screenshots, and extract structured data from dynamic pages that a simple fetch can't handle. Because it runs real Chrome, it works on React apps, infinite-scroll feeds, and any site that relies heavily on JavaScript to render its content. No API key required.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Scrape a product page for pricing data, or screenshot a dashboard for a weekly report.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-puppeteer</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Reach for Puppeteer when a page uses JavaScript to render its content — a plain Fetch won't work on those.</div>
               </div>
             </div>
             <div class="card">
@@ -1362,9 +1367,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Send and read messages, list channels, look up users, and post to Slack workspaces. Requires a Slack bot token and team ID set as environment variables.<br><br>
+                Send and read messages, list channels, look up users, react to messages, and post formatted content to Slack workspaces — all from Claude. Requires a Slack bot token and your team ID set as environment variables (see the API Keys step in Getting Started). You'll need to create a Slack app at api.slack.com/apps, install it to your workspace, and grant it the right bot scopes. Once connected, Claude can draft responses, triage support channels, or post automated summaries.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude monitor a support channel and draft responses to common questions.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-slack</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Use this to bring Claude into team communication workflows — reading channels and drafting messages without copy-pasting.</div>
               </div>
             </div>
             <div class="card">
@@ -1373,9 +1379,10 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                Fetches raw HTML or text from any public URL without opening a browser. Useful for pulling in documentation pages, RSS feeds, or plain-text files directly into your conversation.<br><br>
+                Fetches raw HTML or plain text from any public URL — no browser, no JavaScript execution. It's the lightest-weight way to pull in external content: documentation pages, API responses, README files, RSS feeds, or any server-rendered page. Unlike Puppeteer, it doesn't run JavaScript, so it's fast and simple but only works on pages that render content server-side. No API key required. Pair it with Brave Search for a full research workflow: search returns the URLs, Fetch retrieves the full text.<br><br>
                 <strong style="color:var(--text-mid)">Classroom use:</strong> Point Claude at an API docs page and ask it to write a client based on what it reads.<br><br>
                 <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-fetch</code>
+                <div class="card-takeaway"><strong>Key takeaway:</strong> Use Fetch for static and server-rendered pages; switch to Puppeteer if the page needs JavaScript to load its content.</div>
               </div>
             </div>
           </div>
