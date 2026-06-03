@@ -362,13 +362,14 @@
       color: var(--text-mid);
       font-size: 15px;
       line-height: 1.78;
-      transition: max-height 0.35s ease, opacity 0.22s ease, padding 0.35s ease;
+      transition: max-height 0.22s ease-in, opacity 0.15s ease-in, padding 0.22s ease-in;
     }
 
     .card.open .card-body {
       max-height: 800px;
       opacity: 1;
       padding: 0 22px 22px 66px;
+      transition: max-height 0.38s ease-out, opacity 0.28s ease-out, padding 0.38s ease-out;
     }
 
     .steps {
@@ -1693,8 +1694,11 @@ await server.connect(transport); // requires "type":"module" in package.json</co
       document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', () => {
           const isOpen = card.classList.contains('open');
-          document.querySelectorAll('.card.open').forEach(c => c.classList.remove('open'));
-          if (!isOpen) card.classList.add('open');
+          const openCards = [...document.querySelectorAll('.card.open')];
+          openCards.forEach(c => c.classList.remove('open'));
+          if (!isOpen) {
+            setTimeout(() => card.classList.add('open'), openCards.length ? 80 : 0);
+          }
         });
       });
     }
