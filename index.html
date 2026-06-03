@@ -1272,21 +1272,21 @@
                 <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Tools — functions the model can call</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">A tool is a named function with a description and a JSON Schema defining its inputs. The model reads the description to decide when to use it, then passes validated arguments. Tools can do anything: query a database, call an API, run a shell command, write a file.</div>
+              <div class="card-body">A tool is a named function with a description and a JSON Schema defining its inputs. The model reads the description to decide when to use it, then passes validated arguments — it never guesses at input shapes. Tools can do anything: query a database, call an external API, run a shell command, write a file. In Python, defining a tool is as simple as decorating a function with <code>@mcp.tool()</code> — the SDK infers the schema from your type hints automatically. About 90% of MCP server development is writing tools; resources and prompts are optional extras you can add later.<div class="card-takeaway"><strong>Key takeaway:</strong> Tools are the main primitive — if you're building an MCP server, you're almost certainly building tools.</div></div>
             </div>
             <div class="card">
               <div class="card-header">
                 <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Resources — read-only context the model can access</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">Resources are identified by a URI (e.g. <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">file:///path/to/doc.txt</code>) and return text or binary content. Unlike tools, resources are passive — the model or host fetches them, rather than invoking them with arguments. Useful for exposing files, database rows, or documentation.</div>
+              <div class="card-body">Resources are identified by a URI (e.g. <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">file:///path/to/doc.txt</code> or <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">db://users/42</code>) and return text or binary content. Unlike tools, resources are passive — the model or host fetches them rather than invoking them with arguments. Think of them as read-only data sources: a config file, a database row, a documentation page, a code snippet. Exposing something as a resource makes sense when the data has a stable identifier and doesn't need parameters beyond that ID. In practice, tools are far more commonly used because they're more flexible — but resources are a clean fit when your content maps naturally to a URI.<div class="card-takeaway"><strong>Key takeaway:</strong> Resources give the model read access to named data — use them when your content has a stable URI and doesn't need arguments beyond an ID.</div></div>
             </div>
             <div class="card">
               <div class="card-header">
                 <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Prompts — reusable prompt templates</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">A server can expose named prompt templates with dynamic arguments. The host can surface these as slash-commands or quick actions in the UI. Less commonly used than tools, but useful for standardizing repeated workflows — e.g. a "summarize PR" prompt that always fetches the latest diff first.</div>
+              <div class="card-body">A server can expose named prompt templates with dynamic arguments — like a function that returns a pre-filled conversation starter. The host can surface these as slash-commands or quick actions in the UI (Claude Desktop shows them in the <code>/</code> menu). Prompts make sense when you have a repeated workflow that always starts the same way: "review this PR", "explain this error log", "summarize this week's issues". They're the least commonly used of the three primitives — most servers never define any. Get comfortable building tools first; come back to prompts when you have a clear repeated workflow to standardize.<div class="card-takeaway"><strong>Key takeaway:</strong> Prompts are optional and uncommon — master tools first, then revisit these when you have a concrete repeated workflow.</div></div>
             </div>
           </div>
         </section>
