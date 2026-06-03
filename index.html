@@ -1184,21 +1184,21 @@
                 <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Why does MCP exist?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. MCP standardizes how models discover and invoke tools — so a server written once works with any MCP-compatible client: Claude Desktop, Cursor, VS Code, Continue, and more.</div>
+              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. If you wanted Claude to read your files, you built a custom integration. If you wanted it to query your database, you built another — a completely separate one that shared nothing with the first. MCP standardizes how models discover and invoke tools, so a server written once works with any MCP-compatible client: Claude Desktop, Cursor, VS Code, Continue, Zed, and more. If you're already building software with AI, MCP is the layer that lets your AI actually take actions in your environment — not just talk about them.<div class="card-takeaway"><strong>Key takeaway:</strong> Write the server once; every MCP-compatible AI client can use it without any changes.</div></div>
             </div>
             <div class="card">
               <div class="card-header">
                 <div class="card-header-left"><div class="card-num">02</div><div class="card-title">How is it different from a REST API?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">REST APIs are designed for app-to-app communication with a known schema. MCP is designed for AI-to-tool communication — it includes a built-in discovery step where the model queries what tools are available at runtime, then decides which to call based on the user's request.</div>
+              <div class="card-body">REST APIs are designed for app-to-app communication with a known schema — your code decides which endpoint to call and when. MCP is designed for AI-to-tool communication: it includes a built-in discovery step where the model queries what tools are available at runtime, then decides which to call based on the user's request. You don't write the logic that triggers the tool — the model does, based on what the user asked. Your server doesn't need to know anything about the conversation or the model; it just receives a validated tool call and returns a result. Think of REST as a menu where the developer orders; MCP is a menu where the AI orders.<div class="card-takeaway"><strong>Key takeaway:</strong> With REST, your code decides what to call. With MCP, the model decides — based on the user's intent, not a hardcoded condition.</div></div>
             </div>
             <div class="card">
               <div class="card-header">
                 <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Who created it and who supports it?</div></div>
                 <div class="card-chevron">▶</div>
               </div>
-              <div class="card-body">Created by Anthropic and open-sourced in late 2024. Now supported across Claude Desktop, Cursor, VS Code Copilot Chat, Continue, Zed, and a growing list of AI clients. The spec and SDKs are maintained at <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">github.com/modelcontextprotocol</code>.</div>
+              <div class="card-body">Created by Anthropic and open-sourced in late 2024. In under a year it became the de facto standard for AI tool integrations — adopted by Cursor, VS Code Copilot Chat, Continue, Zed, and dozens of other clients. Official SDKs exist for Python and TypeScript, both actively maintained and well-documented. The spec is open and versioned at <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">github.com/modelcontextprotocol</code> — you can read exactly how it works, not just how to use it. Because the editors you already use support it, any MCP server you build today works across your whole development environment without additional setup.<div class="card-takeaway"><strong>Key takeaway:</strong> MCP is young but already the standard — the Python and TypeScript SDKs are all you need to get building.</div></div>
             </div>
           </div>
         </section>
