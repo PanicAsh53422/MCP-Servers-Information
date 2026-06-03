@@ -1221,7 +1221,7 @@
                 <div class="card-chevron">▶</div>
               </div>
               <div class="card-body">
-                <strong style="color:var(--text-mid)">Host:</strong> the application the user runs (e.g. Claude CLI, Claude Desktop, Cursor). It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
+                <strong style="color:var(--text-mid)">Host:</strong> the application the user runs (e.g. Claude CLI, Claude Desktop, Cursor). For this class we're using Claude CLI as our primary host. It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
                 <strong style="color:var(--text-mid)">Client:</strong> lives inside the host. Maintains a 1:1 connection with one MCP server, forwards tool calls from the model to the server, and routes results back. Also handled for you by the host app.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> a separate process (or remote service) that exposes tools, resources, and prompts. This is what you build. A server can be 30 lines of Python or TypeScript. It runs independently of whatever AI client the user has.
                 <div class="card-takeaway"><strong>Key takeaway:</strong> As a developer, your job is the server. The host and client are handled by whatever AI app the user is already running.</div>
@@ -1470,7 +1470,7 @@
           <div class="section-eyebrow">Section 06</div>
           <div class="section-title">Getting <span>Started</span></div>
           <div class="section-desc">
-            Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately.
+            Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately. If you prefer a GUI, Claude Desktop supports the same servers — the servers section of this guide covers both.
           </div>
           <div class="steps">
             <div class="step">
@@ -1481,7 +1481,8 @@
                   <code class="code-block">npm install -g @anthropic-ai/claude-code</code>
                   Then log in:
                   <code class="code-block">claude</code>
-                  Follow the prompts to authenticate with your Anthropic account.
+                  Follow the prompts to authenticate with your Anthropic account.<br><br>
+                  <strong style="color:var(--text-mid)">Prefer a GUI?</strong> Claude Desktop (anthropic.com/download) supports the same MCP servers. Configuration lives in a JSON file instead of the CLI — the pattern is the same, just a different interface.
                 </div>
               </div>
             </div>
