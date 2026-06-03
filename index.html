@@ -1406,7 +1406,8 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You need to research a topic across multiple sources and synthesize findings without copy-pasting from tab to tab.<br><br>
                 <strong style="color:var(--text-mid)">Servers:</strong> Brave Search + Fetch<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude searches the web for your query, fetches the full text of the top results, and returns a structured summary with citations — all in one response.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude runs the search, fetches the full text of the top 3–5 results, cross-references them, and returns a structured summary with source citations — all in a single response. What normally takes 20 minutes of tab-switching takes under 30 seconds. The citations are real URLs you can verify yourself.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: search → fetch → synthesize. One prompt replaces an entire manual research session.</div>
               </div>
             </div>
             <div class="card">
@@ -1417,7 +1418,8 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You want AI feedback on a pull request without pasting the whole diff into a chat window.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> GitHub<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude fetches the PR diff directly from GitHub, reads the changed files, and returns structured review comments organized by file — pointing to specific lines.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude fetches the PR diff directly from GitHub, reads the changed files and their surrounding context, and returns structured review comments organized by file — pointing to specific lines. You get the same output as a human code review: what changed, what could break, what edge cases weren't handled. Because it reads the actual diff, the feedback references real line numbers, not paraphrases.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: fetch diff → analyze changes → structured output. Claude reviews your PR the same way a teammate would.</div>
               </div>
             </div>
             <div class="card">
@@ -1428,7 +1430,8 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> A teammate handed you a Postgres database with no documentation and you need to understand it fast.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> Postgres<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude queries the schema, describes each table in plain English, maps out the relationships, and answers questions like "which table tracks user sessions?" without you writing a single query.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude queries the schema, describes each table in plain English, and maps out the relationships between them. Because it loaded the full schema in its first query, you can then ask follow-up questions like "which table tracks user sessions?" or "write a query that joins orders to users" and it already has the context to answer accurately — no copy-pasting schema dumps required.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read schema → answer questions in plain English. No documentation needed to understand an unfamiliar database.</div>
               </div>
             </div>
             <div class="card">
@@ -1439,7 +1442,8 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> You need structured data from a website that doesn't offer an API.<br><br>
                 <strong style="color:var(--text-mid)">Server:</strong> Puppeteer<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude navigates to the page, waits for dynamic content to load, extracts the data you describe (prices, names, dates), and returns it as a clean table ready to copy into a spreadsheet.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude navigates to the page, waits for JavaScript to render, extracts the specific data you described (prices, names, dates, links), and returns it as a clean structured table. You can ask it to handle pagination, filter by criteria, or scrape multiple pages — all in plain English. The output is ready to paste into a spreadsheet or feed into another script.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: navigate → wait → extract → structure. Describe the data you want in plain English; Claude handles the scraping logic.</div>
               </div>
             </div>
             <div class="card">
@@ -1450,7 +1454,8 @@
               <div class="card-body">
                 <strong style="color:var(--text-mid)">Problem:</strong> New GitHub issues pile up and it takes time to triage them, assign labels, and notify the team.<br><br>
                 <strong style="color:var(--text-mid)">Servers:</strong> GitHub + Slack<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude reads open issues, categorizes them by type (bug, feature, question), posts a triage summary to a Slack channel, and suggests label assignments — in one prompt.
+                <strong style="color:var(--text-mid)">Outcome:</strong> Claude reads every open issue, categorizes them by type (bug, feature request, question, docs), estimates priority based on the description and reactions, posts a formatted triage summary to a Slack channel, and suggests label assignments — all from a single prompt. What normally takes a 15-minute triage meeting becomes a one-liner. You review the suggestions, apply what looks right, and move on.
+                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read → categorize → act across systems. Combining two servers turns a manual recurring workflow into a single prompt.</div>
               </div>
             </div>
           </div>
