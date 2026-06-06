@@ -8,468 +8,656 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
+    /* ── CSS Variables ── */
     :root {
-      --page:         #05080d;
-      --panel:        #0a1018;
-      --panel-soft:   #0d1622;
-      --panel-lift:   #111c2a;
-      --line:         #1b2a3a;
-      --line-soft:    #142131;
-      --accent:       #37d5e8;
-      --accent-2:     #7c9cff;
-      --accent-3:     #43e0a8;
-      --text-primary: #edf5f7;
-      --text-mid:     #b6c7d3;
-      --text-muted:   #8296a5;
-      --text-dim:     #516776;
-      --shadow:       rgba(0, 0, 0, 0.42);
-      --font-ui:      'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-code:    'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --bg-start:       #020617;
+      --bg-end:         #0f172a;
+      --accent:         #38bdf8;
+      --accent-2:       #a855f7;
+      --text-primary:   #f1f5f9;
+      --text-secondary: rgba(255, 255, 255, 0.5);
+      --text-dim:       rgba(255, 255, 255, 0.35);
+      --card-bg:        rgba(15, 23, 42, 0.6);
+      --card-border:    rgba(56, 189, 248, 0.1);
+      --font-ui:        'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-code:      'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
+    /* ── Base ── */
     body {
       min-height: 100vh;
       font-family: var(--font-ui);
       font-size: 15px;
       line-height: 1.6;
       color: var(--text-primary);
-      background:
-        linear-gradient(115deg, rgba(55, 213, 232, 0.08), transparent 28%),
-        linear-gradient(245deg, rgba(124, 156, 255, 0.09), transparent 26%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 80px),
-        var(--page);
+      background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
       text-rendering: optimizeLegibility;
+      overflow-x: hidden;
     }
 
     code { font-family: var(--font-code); }
 
-    .layout {
-      display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-      min-height: 100vh;
+    a { color: inherit; }
+
+    /* ── Canvas ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    .sidebar {
-      position: sticky;
+    /* ── Top Nav ── */
+    .top-nav {
+      position: fixed;
       top: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      background: rgba(7, 12, 18, 0.92);
-      border-right: 1px solid var(--line);
-      box-shadow: 24px 0 70px rgba(0, 0, 0, 0.22);
-      backdrop-filter: blur(18px);
-    }
-
-    .sidebar-brand {
-      padding: 30px 24px 22px;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .brand-eyebrow {
-      margin-bottom: 14px;
-      color: var(--accent);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-    }
-
-    .brand-name {
-      margin-bottom: 10px;
-      color: var(--text-primary);
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 0.95;
-    }
-
-    .brand-name::after {
-      content: '';
-      display: block;
-      width: 58px;
-      height: 3px;
-      margin-top: 18px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
-    }
-
-    .brand-tagline {
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .sidebar-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      padding: 1px;
-      background: var(--line-soft);
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .stat {
-      padding: 14px 8px;
-      text-align: center;
-      background: rgba(11, 18, 27, 0.95);
-    }
-
-    .stat-num {
-      color: var(--text-primary);
-      font-family: var(--font-code);
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .stat-lbl {
-      margin-top: 5px;
-      color: var(--text-dim);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 18px 14px 28px;
-    }
-
-    .nav-group-label {
-      margin: 20px 10px 8px;
-      color: var(--text-dim);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-    }
-
-    .nav-item {
+      left: 0;
+      right: 0;
+      z-index: 100;
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-height: 38px;
-      margin-bottom: 4px;
-      padding: 9px 11px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      justify-content: space-between;
+      gap: 24px;
+      height: 64px;
+      padding: 0 32px;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
 
-    .nav-item:hover,
-    .nav-item:focus-visible {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.035);
-      border-color: var(--line);
-      outline: none;
-    }
-
-    .nav-item.active {
-      color: var(--text-primary);
-      background: linear-gradient(90deg, rgba(55, 213, 232, 0.16), rgba(124, 156, 255, 0.07));
-      border-color: rgba(55, 213, 232, 0.34);
-    }
-
-    .nav-icon {
-      width: 18px;
-      color: var(--accent);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    .main {
-      position: relative;
-      min-width: 0;
-      background:
-        linear-gradient(180deg, rgba(12, 20, 31, 0.8), rgba(5, 8, 13, 0.96) 38%, rgba(7, 13, 20, 1)),
-        var(--page);
-    }
-
-    .main::before {
-      content: '';
-      position: fixed;
-      inset: 0 0 0 280px;
+    .top-nav.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
       pointer-events: none;
-      background:
-        linear-gradient(rgba(67, 224, 168, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(55, 213, 232, 0.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(to bottom, black, transparent 760px);
-      -webkit-mask-image: linear-gradient(to bottom, black, transparent 760px);
     }
 
-    .content {
-      position: relative;
-      z-index: 1;
-      width: min(100%, 1040px);
-      margin: 0 auto;
-      padding: 72px 52px 96px;
+    .nav-brand {
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    .section {
-      position: relative;
-      margin-bottom: 72px;
-      scroll-margin-top: 36px;
+    .nav-brand span {
+      color: var(--accent);
     }
 
-    .section:first-of-type {
-      min-height: min(640px, 88vh);
+    .nav-links {
       display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-link {
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger {
+      display: none;
       flex-direction: column;
       justify-content: center;
-      padding: 34px 0 58px;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      padding: 6px;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      height: 1.5px;
+      background: var(--text-secondary);
+      border-radius: 999px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    /* Mobile nav panel */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      padding: 16px 20px 24px;
+      background: rgba(2, 6, 23, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-nav.open {
+      display: flex;
+    }
+
+    .mobile-nav-link {
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .mobile-nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .btn-gradient {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-gradient:hover {
+      box-shadow: 0 0 36px rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+
+    /* ── Hero Section ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      min-height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 40px 80px;
+      gap: 60px;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 7vw, 88px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title-white {
+      display: block;
+      color: var(--text-primary);
+    }
+
+    .hero-title-gradient {
+      display: block;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      color: var(--text-secondary);
+      font-size: 17px;
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Orbital graphic */
+    .hero-graphic {
+      position: relative;
+      width: 420px;
+      height: 420px;
+      flex-shrink: 0;
+    }
+
+    .orbit-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(56, 189, 248, 0.8), rgba(168, 85, 247, 0.4));
+      box-shadow:
+        0 0 40px rgba(56, 189, 248, 0.5),
+        0 0 80px rgba(56, 189, 248, 0.2),
+        0 0 120px rgba(168, 85, 247, 0.15);
+    }
+
+    .orbit-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      border-style: solid;
+      border-color: rgba(56, 189, 248, 0.15);
+      transform: translate(-50%, -50%);
+    }
+
+    .orbit-ring-1 {
+      width: 160px;
+      height: 160px;
+      border-width: 1px;
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+
+    .orbit-ring-2 {
+      width: 280px;
+      height: 280px;
+      border-width: 1px;
+      border-color: rgba(56, 189, 248, 0.15);
+    }
+
+    .orbit-ring-3 {
+      width: 400px;
+      height: 400px;
+      border-width: 1px;
+      border-color: rgba(168, 85, 247, 0.1);
+    }
+
+    /* Hero animation classes */
+    .hero-anim {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .hero-anim.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-anim:nth-child(1) { transition-delay: 0.1s; }
+    .hero-anim:nth-child(2) { transition-delay: 0.2s; }
+    .hero-anim:nth-child(3) { transition-delay: 0.3s; }
+    .hero-anim:nth-child(4) { transition-delay: 0.4s; }
+
+    .hero-graphic-anim {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.9s ease 0.3s, transform 0.9s ease 0.3s;
+    }
+
+    .hero-graphic-anim.loaded {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ── Main Content ── */
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px 120px;
+    }
+
+    /* ── Section Divider ── */
+    .section-divider {
+      height: 1px;
+      margin: 80px 0;
+      border: 0;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
+    }
+
+    /* ── Content Sections ── */
+    .content-section {
+      margin-bottom: 20px;
+      scroll-margin-top: 80px;
     }
 
     .section-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      margin-bottom: 18px;
-      padding: 6px 10px;
-      border: 1px solid rgba(55, 213, 232, 0.28);
-      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 14px;
       color: var(--accent);
-      background: rgba(55, 213, 232, 0.08);
-      font-family: var(--font-code);
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
     .section-title {
-      max-width: 840px;
-      margin-bottom: 18px;
-      color: var(--text-primary);
-      font-size: clamp(38px, 7vw, 82px);
+      margin-bottom: 16px;
+      font-size: clamp(32px, 4vw, 52px);
       font-weight: 800;
-      line-height: 0.96;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
     }
 
-    .section:not(:first-of-type) .section-title {
-      font-size: clamp(32px, 4vw, 56px);
-      line-height: 1;
-    }
-
-    .section-title span {
-      color: var(--accent);
+    .section-title .gradient-text {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .section-desc {
       max-width: 760px;
-      margin-bottom: 34px;
-      color: var(--text-mid);
-      font-size: 18px;
+      margin-bottom: 32px;
+      color: var(--text-secondary);
+      font-size: 16px;
       line-height: 1.75;
     }
 
-    .section:not(:first-of-type) .section-desc {
-      max-width: 720px;
-      font-size: 16px;
-    }
-
-    .section-divider {
-      height: 1px;
-      margin: 0 0 72px;
-      border: 0;
-      background: linear-gradient(90deg, transparent, var(--line), transparent);
-    }
-
-    .cards {
-      display: grid;
-      gap: 12px;
-    }
-
-    .card {
-      overflow: hidden;
-      cursor: pointer;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(12, 20, 31, 0.82);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(55, 213, 232, 0.34);
-      background: rgba(15, 26, 40, 0.92);
-    }
-
-    .card.open {
-      border-color: rgba(67, 224, 168, 0.42);
-      background: rgba(15, 26, 40, 0.96);
-      box-shadow: 0 24px 70px var(--shadow);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      min-height: 66px;
-      padding: 17px 18px;
-      user-select: none;
-    }
-    .card-header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
-    .card-num {
-      width: 34px; height: 34px;
-      border: 1px solid rgba(55, 213, 232, 0.28);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(55, 213, 232, 0.08);
+    .section-desc .inline-code {
       color: var(--accent);
       font-family: var(--font-code);
-      font-size: 11px;
+      font-size: 0.88em;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    /* ── Cards Grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── Glass Card ── */
+    .glass-card {
+      padding: 28px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(56, 189, 248, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .card-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--accent);
+      font-family: var(--font-code);
+      font-size: 12px;
       font-weight: 700;
-      flex-shrink: 0;
     }
 
     .card-title {
+      margin-bottom: 12px;
       color: var(--text-primary);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       line-height: 1.35;
     }
 
-    .card-chevron {
-      color: var(--text-muted);
-      font-size: 12px;
-      transition: transform 0.25s ease, color 0.25s ease;
-      flex-shrink: 0;
-    }
-
-    .card.open .card-chevron {
-      transform: rotate(90deg);
-      color: var(--accent-3);
-    }
-
     .card-body {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      padding: 0 22px 0 66px;
-      border-top: 1px solid var(--line-soft);
-      color: var(--text-mid);
-      font-size: 15px;
+      color: var(--text-secondary);
+      font-size: 14.5px;
       line-height: 1.78;
-      transition: max-height 0.22s ease-in, opacity 0.15s ease-in, padding 0.22s ease-in;
     }
 
-    .card.open .card-body {
-      max-height: 800px;
-      opacity: 1;
-      padding: 0 22px 22px 66px;
-      transition: max-height 0.38s ease-out, opacity 0.28s ease-out, padding 0.38s ease-out;
+    .card-body strong {
+      color: var(--text-primary);
     }
 
-    .steps {
-      position: relative;
+    .card-body a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-family: var(--font-code);
+      font-size: 0.88em;
+    }
+
+    .card-body a:hover {
+      color: #7dd3fc;
+    }
+
+    .inline-code {
+      color: var(--accent);
+      font-family: var(--font-code);
+      font-size: 0.88em;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    /* ── Takeaway callout ── */
+    .card-takeaway {
+      margin-top: 18px;
+      padding: 10px 14px;
+      border-left: 2px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      background: rgba(56, 189, 248, 0.06);
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .card-takeaway strong {
+      color: var(--accent);
+    }
+
+    .section-takeaway {
+      margin-top: 28px;
+      padding: 14px 18px;
+      border-left: 2px solid var(--accent-2);
+      border-radius: 0 6px 6px 0;
+      background: rgba(168, 85, 247, 0.06);
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .section-takeaway strong {
+      color: var(--accent-2);
+    }
+
+    .section-takeaway .inline-code {
+      color: var(--accent-2);
+      background: rgba(168, 85, 247, 0.08);
+      border-color: rgba(168, 85, 247, 0.2);
+    }
+
+    /* ── Step Cards (Getting Started) ── */
+    .steps-grid {
       display: grid;
-      gap: 14px;
+      gap: 16px;
     }
 
-    .step {
+    .step-card {
       display: flex;
-      gap: 18px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(12, 20, 31, 0.78);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+      gap: 20px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .step-card:hover {
+      border-color: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.38);
     }
 
     .step-num {
-      width: 36px; height: 36px;
-      border: 1px solid rgba(55, 213, 232, 0.28);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(55, 213, 232, 0.08);
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.08);
       color: var(--accent);
       font-family: var(--font-code);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       flex-shrink: 0;
     }
 
-    .step-content { flex: 1; min-width: 0; }
+    .step-content {
+      flex: 1;
+      min-width: 0;
+    }
 
     .step-title {
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: var(--text-primary);
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
     }
 
     .step-desc {
-      color: var(--text-mid);
-      font-size: 15px;
+      color: var(--text-secondary);
+      font-size: 14.5px;
       line-height: 1.78;
     }
 
+    .step-desc strong {
+      color: var(--text-primary);
+    }
+
+    .step-desc .inline-code {
+      color: var(--accent);
+      font-family: var(--font-code);
+      font-size: 0.88em;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    /* ── Code blocks ── */
     .code-block {
       display: block;
       max-width: 100%;
       margin-top: 12px;
       padding: 16px 18px;
       overflow-x: auto;
-      border: 1px solid #223548;
+      border: 1px solid rgba(56, 189, 248, 0.12);
       border-radius: 8px;
-      background: #050a10;
-      color: #9df3ff;
+      background: rgba(2, 6, 23, 0.8);
+      color: #7dd3fc;
       font-family: var(--font-code);
-      font-size: 12px;
+      font-size: 12.5px;
       line-height: 1.8;
       white-space: pre;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      width: fit-content;
-      margin-bottom: 16px;
-      padding: 5px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(8, 14, 21, 0.86);
-    }
-
-    .tab-btn {
-      min-width: 104px;
-      padding: 8px 14px;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-family: var(--font-code);
-      font-size: 12px;
-      font-weight: 600;
-      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .tab-btn:hover { color: var(--text-primary); }
-
-    .tab-btn.active {
-      border-color: rgba(55, 213, 232, 0.28);
-      background: rgba(55, 213, 232, 0.12);
-      color: var(--text-primary);
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
 
     .code-block-label {
       margin-bottom: 8px;
@@ -478,1073 +666,603 @@
       font-size: 11px;
     }
 
-    strong { color: var(--text-primary) !important; }
-
-    .card-body code:not(.code-block),
-    .step-desc code:not(.code-block),
-    .section-desc code:not(.code-block) {
-      color: var(--accent) !important;
-      font-size: 0.88em !important;
-      background: rgba(55, 213, 232, 0.08);
-      border: 1px solid rgba(55, 213, 232, 0.16);
-      border-radius: 5px;
-      padding: 1px 5px;
-    }
-
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-
-      .sidebar {
-        position: relative;
-        height: auto;
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .sidebar-brand {
-        padding: 22px 22px 18px;
-      }
-
-      .brand-name {
-        font-size: 30px;
-      }
-
-      .sidebar-nav {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding: 14px 16px 18px;
-      }
-
-      .nav-group-label { display: none; }
-
-      .nav-item {
-        flex: 0 0 auto;
-        white-space: nowrap;
-      }
-
-      .main::before { inset: 0; }
-
-      .content {
-        padding: 42px 20px 68px;
-      }
-
-      .section:first-of-type {
-        min-height: auto;
-        padding-top: 18px;
-      }
-
-      .section-title {
-        font-size: clamp(40px, 14vw, 64px);
-      }
-
-      .section-desc {
-        font-size: 16px;
-      }
-
-      .card-header {
-        min-height: 60px;
-        padding: 14px;
-      }
-
-      .card-title {
-        font-size: 15px;
-      }
-
-      .card-body {
-        padding: 0 16px 18px 16px;
-        font-size: 14px;
-      }
-
-      .step {
-        padding: 16px;
-      }
-    }
-
-    @media (max-width: 560px) {
-      body { font-size: 14px; }
-
-      .sidebar-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-      .nav-icon { display: none; }
-
-      .section {
-        margin-bottom: 52px;
-      }
-
-      .section-divider {
-        margin-bottom: 52px;
-      }
-
-      .section-eyebrow {
-        font-size: 10px;
-      }
-
-      .section-title,
-      .section:not(:first-of-type) .section-title {
-        font-size: clamp(34px, 12vw, 48px);
-      }
-
-      .card-num,
-      .step-num {
-        width: 31px;
-        height: 31px;
-      }
-
-      .step {
-        gap: 12px;
-      }
-
-      .tabs {
-        width: 100%;
-      }
-
-      .tab-btn {
-        flex: 1;
-        min-width: 0;
-      }
-    }
-
-    /* Editorial dark-mode overhaul */
-    :root {
-      --page:         #07090d;
-      --panel:        #101821;
-      --panel-soft:   #131e28;
-      --panel-lift:   #182533;
-      --line:         #2b3a48;
-      --line-soft:    #1d2a36;
-      --accent:       #5eead4;
-      --accent-2:     #60a5fa;
-      --accent-3:     #a78bfa;
-      --text-primary: #f4f7f8;
-      --text-mid:     #c4d0d7;
-      --text-muted:   #93a4af;
-      --text-dim:     #657783;
-      --shadow:       rgba(0, 0, 0, 0.34);
-    }
-
-    body {
-      background:
-        linear-gradient(135deg, rgba(94, 234, 212, 0.09), transparent 24%),
-        linear-gradient(315deg, rgba(96, 165, 250, 0.08), transparent 22%),
-        linear-gradient(180deg, #07090d 0%, #0a0d12 46%, #080b10 100%);
-      color: var(--text-primary);
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px);
-      background-size: 120px 120px;
-      opacity: 0.7;
-    }
-
-    .layout {
-      grid-template-columns: 304px minmax(0, 1fr);
-    }
-
-    .sidebar {
-      background: #0c1117;
-      border-right: 1px solid #273442;
-      box-shadow: none;
-      backdrop-filter: none;
-    }
-
-    .sidebar-brand {
-      padding: 34px 28px 28px;
-      border-bottom-color: #202b36;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.035), transparent),
-        #0e141b;
-    }
-
-    .brand-eyebrow {
-      color: var(--text-muted);
-      font-size: 10px;
-      letter-spacing: 1.2px;
-    }
-
-    .brand-name {
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 0.92;
-      letter-spacing: 0;
-    }
-
-    .brand-name::after {
+    /* ── Tabs ── */
+    .tab-group {
       width: 100%;
-      height: 1px;
-      margin-top: 24px;
-      border-radius: 0;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2), transparent);
-    }
-
-    .brand-tagline {
-      color: var(--text-mid);
-      font-family: var(--font-code);
-      font-size: 11px;
-    }
-
-    .sidebar-stats {
-      padding: 0;
-      gap: 0;
-      background: #202b36;
-      border-bottom-color: #202b36;
-    }
-
-    .stat {
-      padding: 16px 8px;
-      background: #101821;
-    }
-
-    .stat-num {
-      color: var(--accent);
-      font-size: 20px;
-    }
-
-    .stat-lbl {
-      color: var(--text-muted);
-      letter-spacing: 0.8px;
-    }
-
-    .sidebar-nav {
-      padding: 22px 18px 30px;
-    }
-
-    .nav-group-label {
-      margin: 22px 10px 10px;
-      color: var(--text-dim);
-      font-size: 10px;
-      letter-spacing: 1.2px;
-    }
-
-    .nav-item {
-      min-height: 42px;
-      padding: 10px 12px;
-      border-radius: 6px;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .nav-icon {
-      color: var(--text-dim);
-    }
-
-    .nav-item:hover,
-    .nav-item:focus-visible {
-      background: #131c25;
-      border-color: #2a3947;
-      color: var(--text-primary);
-    }
-
-    .nav-item.active {
-      background: #16222e;
-      border-color: rgba(94, 234, 212, 0.45);
-      color: var(--text-primary);
-      box-shadow: inset 3px 0 0 var(--accent);
-    }
-
-    .nav-item.active .nav-icon {
-      color: var(--accent);
-    }
-
-    .main {
-      background:
-        linear-gradient(180deg, rgba(16, 24, 33, 0.86), rgba(7, 9, 13, 0.98) 420px),
-        #07090d;
-    }
-
-    .main::before {
-      inset: 0 0 0 304px;
-      background:
-        linear-gradient(115deg, rgba(94, 234, 212, 0.14), transparent 34%),
-        linear-gradient(290deg, rgba(96, 165, 250, 0.12), transparent 30%);
-      background-size: auto;
-      opacity: 0.55;
-      mask-image: linear-gradient(to bottom, black 0, transparent 620px);
-      -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 620px);
-    }
-
-    .content {
-      width: min(100%, 1120px);
-      padding: 76px 64px 110px;
-    }
-
-    .section {
-      margin-bottom: 84px;
-    }
-
-    .section:first-of-type {
-      min-height: min(680px, 90vh);
-      padding: 42px 0 70px;
-    }
-
-    .section-eyebrow {
-      margin-bottom: 22px;
-      padding: 0 0 8px;
-      border: 0;
-      border-bottom: 1px solid rgba(94, 234, 212, 0.6);
-      border-radius: 0;
-      background: transparent;
-      color: var(--accent);
-      font-size: 12px;
-      letter-spacing: 0;
-    }
-
-    .section-title {
-      max-width: 900px;
-      margin-bottom: 22px;
-      font-size: clamp(48px, 8vw, 96px);
-      font-weight: 700;
-      line-height: 0.94;
-      letter-spacing: 0;
-    }
-
-    .section:not(:first-of-type) .section-title {
-      font-size: clamp(36px, 5vw, 64px);
-      line-height: 0.98;
-    }
-
-    .section-title span {
-      color: var(--accent);
-      text-decoration: underline;
-      text-decoration-color: rgba(96, 165, 250, 0.5);
-      text-decoration-thickness: 0.08em;
-      text-underline-offset: 0.13em;
-    }
-
-    .section-desc {
-      max-width: 820px;
-      margin-bottom: 38px;
-      color: var(--text-mid);
-      font-size: 19px;
-      line-height: 1.78;
-    }
-
-    .section:not(:first-of-type) .section-desc {
-      max-width: 780px;
-      font-size: 17px;
-    }
-
-    .section-divider {
-      margin-bottom: 84px;
-      background: linear-gradient(90deg, var(--accent), var(--line), transparent 74%);
-      opacity: 0.45;
-    }
-
-    .cards {
-      gap: 14px;
-    }
-
-    .card {
-      border-color: #273645;
-      border-radius: 6px;
-      background: #101821;
-      box-shadow: 0 16px 46px rgba(0, 0, 0, 0.18);
-    }
-
-    .card:hover {
-      transform: translateY(-1px);
-      border-color: rgba(96, 165, 250, 0.5);
-      background: #131e28;
-    }
-
-    .card.open {
-      border-color: rgba(94, 234, 212, 0.58);
-      background: #14202b;
-      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
-    }
-
-    .card-header {
-      min-height: 72px;
-      padding: 20px 22px;
-    }
-
-    .card-num {
-      width: 42px;
-      height: 42px;
-      border-color: #304353;
-      border-radius: 6px;
-      background: #0b1117;
-      color: var(--accent);
-    }
-
-    .card-title {
-      color: var(--text-primary);
-      font-size: 17px;
-      font-weight: 650;
-    }
-
-    .card-chevron {
-      color: var(--text-dim);
-    }
-
-    .card.open .card-chevron {
-      color: var(--accent);
-    }
-
-    .card-body {
-      padding: 0 24px 24px 80px;
-      border-top-color: #22303c;
-      color: var(--text-mid);
-      font-size: 15.5px;
-    }
-
-    .steps {
-      gap: 16px;
-    }
-
-    .step {
-      padding: 22px;
-      border-color: #273645;
-      border-radius: 6px;
-      background: #101821;
-      box-shadow: 0 16px 46px rgba(0, 0, 0, 0.16);
-    }
-
-    .step-num {
-      width: 42px;
-      height: 42px;
-      border-color: #304353;
-      border-radius: 6px;
-      background: #0b1117;
-      color: var(--accent);
-    }
-
-    .step-title {
-      font-size: 18px;
-      font-weight: 650;
-    }
-
-    .step-desc {
-      color: var(--text-mid);
-      font-size: 15.5px;
-    }
-
-    .code-block {
-      border-color: #26394a;
-      border-radius: 6px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.025), transparent),
-        #060a0f;
-      color: #b7f7ee;
-      font-size: 12.5px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 32px rgba(0,0,0,0.18);
     }
 
     .tabs {
-      border-color: #263746;
-      border-radius: 6px;
-      background: #0b1117;
+      display: flex;
+      gap: 8px;
+      width: fit-content;
+      margin-bottom: 16px;
+      padding: 5px;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.6);
     }
 
     .tab-btn {
-      border-radius: 4px;
-      color: var(--text-muted);
+      min-width: 104px;
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: var(--font-code);
+      font-size: 12px;
+      font-weight: 600;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
-    .tab-btn.active {
-      border-color: rgba(94, 234, 212, 0.42);
-      background: #15222d;
+    .tab-btn:hover {
       color: var(--text-primary);
     }
 
-    .card-body code:not(.code-block),
-    .step-desc code:not(.code-block),
-    .section-desc code:not(.code-block) {
-      border-color: rgba(94, 234, 212, 0.22);
-      background: rgba(94, 234, 212, 0.08);
-      color: var(--accent) !important;
+    .tab-btn.active {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--text-primary);
     }
 
-    .card-takeaway {
-      margin-top: 18px;
-      padding: 10px 14px;
-      border-left: 2px solid var(--accent);
-      border-radius: 0 4px 4px 0;
-      background: rgba(94, 234, 212, 0.06);
-      color: var(--text-mid);
-      font-size: 14.5px;
-      line-height: 1.7;
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Scroll Reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
     }
 
-    .card-takeaway strong {
-      color: var(--accent);
-      font-weight: 650;
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .section-takeaway {
-      margin-top: 28px;
-      padding: 14px 18px;
-      border-left: 2px solid var(--accent-2);
-      border-radius: 0 4px 4px 0;
-      background: rgba(96, 165, 250, 0.06);
-      color: var(--text-mid);
-      font-size: 15px;
-      line-height: 1.7;
+    /* ── Presentation Mode ── */
+    .slide-container {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: var(--bg-start);
     }
 
-    .section-takeaway strong {
-      color: var(--accent-2);
-      font-weight: 650;
+    .slide-container.active {
+      display: block;
     }
 
-    @media (min-width: 1040px) {
-      #popular-servers .cards,
-      #use-cases .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .pres-progress {
+      display: none;
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pres-progress.active {
+      display: flex;
+    }
+
+    .pres-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .pres-dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+
+    @keyframes dissolve-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes dissolve-out {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slide.slide-active {
+      opacity: 1;
+      pointer-events: auto;
+      animation: dissolve-in 0.4s ease forwards;
+    }
+
+    .slide.slide-exit {
+      animation: dissolve-out 0.4s ease forwards;
+    }
+
+    .pres-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 201;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+    }
+
+    body.cursor-hidden,
+    body.cursor-hidden * {
+      cursor: none !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 100px 32px 60px;
+        gap: 40px;
       }
 
-      #popular-servers .card-body,
-      #use-cases .card-body {
-        padding-left: 24px;
+      .hero-left {
+        align-items: center;
+      }
+
+      .hero-desc {
+        max-width: 600px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: flex;
       }
     }
 
-    @media (max-width: 900px) {
-      .layout {
+    @media (max-width: 768px) {
+      .top-nav {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding: 90px 20px 60px;
+      }
+
+      .hero-right {
+        display: none;
+      }
+
+      .nav-right .btn-gradient {
+        display: none;
+      }
+
+      .content-wrap {
+        padding: 0 20px 80px;
+      }
+
+      .section-divider {
+        margin: 60px 0;
+      }
+
+      .cards-grid {
         grid-template-columns: 1fr;
       }
 
-      .sidebar {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        height: auto;
-        max-height: 50vh;
-        border-right: 0;
-      }
-
-      .sidebar-brand {
-        padding: 18px 20px;
-      }
-
-      .brand-name {
-        font-size: 28px;
-      }
-
-      .brand-name::after {
-        margin-top: 14px;
-      }
-
-      .main::before {
-        inset: 0;
-      }
-
-      .content {
-        padding: 42px 20px 72px;
-      }
-
-      .section:first-of-type {
-        min-height: auto;
-      }
-
-      .section-title {
-        font-size: clamp(42px, 13vw, 68px);
-      }
-
-      .card-body {
-        padding: 0 16px 18px;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .sidebar {
-        max-height: none;
-      }
-
-      .section-title,
-      .section:not(:first-of-type) .section-title {
-        font-size: clamp(36px, 13vw, 52px);
-      }
-
-      .section-desc,
-      .section:not(:first-of-type) .section-desc {
-        font-size: 15.5px;
-      }
-
-      .card-header-left {
-        gap: 12px;
-      }
-
-      .card-num,
-      .step-num {
-        width: 34px;
-        height: 34px;
-      }
-
-      .card-title {
-        font-size: 15px;
-      }
-
-      .step {
-        padding: 16px;
-      }
-    }
-
-    @media (pointer: fine) {
-      body.cursor-ready,
-      body.cursor-ready a,
-      body.cursor-ready button,
-      body.cursor-ready .card {
-        cursor: none;
-      }
-
-      .cursor-dot,
-      .cursor-ring {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        pointer-events: none;
-        opacity: 0;
-        transform: translate3d(-50%, -50%, 0);
-        transition: opacity 0.18s ease, width 0.18s ease, height 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-      }
-
-      .cursor-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 999px;
-        background: #c4b5fd;
-        box-shadow: 0 0 18px rgba(196, 181, 253, 0.48);
-      }
-
-      .cursor-ring {
-        width: 28px;
-        height: 28px;
-        border: 1px solid rgba(196, 181, 253, 0.62);
-        border-radius: 999px;
-        background: rgba(196, 181, 253, 0.035);
-      }
-
-      body.cursor-ready .cursor-dot,
-      body.cursor-ready .cursor-ring {
-        opacity: 1;
-      }
-
-      body.cursor-hover .cursor-dot {
-        width: 4px;
-        height: 4px;
-        background: #f0abfc;
-      }
-
-      body.cursor-hover .cursor-ring {
-        width: 44px;
-        height: 44px;
-        border-color: rgba(240, 171, 252, 0.68);
-        background: rgba(240, 171, 252, 0.07);
+      .hero-title {
+        font-size: clamp(40px, 10vw, 64px);
       }
     }
   </style>
 </head>
 <body>
-  <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="cursor-ring" aria-hidden="true"></div>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-eyebrow">Dixie Tech · AI Division</div>
-        <div class="brand-name">MCP<br>Servers</div>
-        <div class="brand-tagline">// Model Context Protocol</div>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ── Top Navigation ── -->
+  <nav class="top-nav" id="top-nav">
+    <div class="nav-brand"><span>MCP</span> Servers</div>
+    <div class="nav-links">
+      <a href="#what-is-mcp"       class="nav-link">Concepts</a>
+      <a href="#how-it-works"      class="nav-link">Architecture</a>
+      <a href="#core-capabilities" class="nav-link">Primitives</a>
+      <a href="#popular-servers"   class="nav-link">Ecosystem</a>
+      <a href="#use-cases"         class="nav-link">Applications</a>
+      <a href="#getting-started"   class="nav-link">Hands-on</a>
+      <a href="#code-examples"     class="nav-link">Build</a>
+    </div>
+    <div class="nav-right">
+      <button type="button" class="btn btn-gradient btn-sm" id="present-btn">Present</button>
+      <button type="button" class="nav-hamburger" id="hamburger-btn" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Mobile Nav Panel ── -->
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#what-is-mcp"       class="mobile-nav-link">01 · Concepts</a>
+    <a href="#how-it-works"      class="mobile-nav-link">02 · Architecture</a>
+    <a href="#core-capabilities" class="mobile-nav-link">03 · Primitives</a>
+    <a href="#popular-servers"   class="mobile-nav-link">04 · Ecosystem</a>
+    <a href="#use-cases"         class="mobile-nav-link">05 · Applications</a>
+    <a href="#getting-started"   class="mobile-nav-link">06 · Hands-on</a>
+    <a href="#code-examples"     class="mobile-nav-link">07 · Build</a>
+  </div>
+
+  <!-- ── Hero Section ── -->
+  <section class="hero" id="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow hero-anim">Dixie Tech &middot; AI Division</div>
+      <h1 class="hero-title hero-anim">
+        <span class="hero-title-white">We Taught AI</span>
+        <span class="hero-title-gradient">to Use Tools.</span>
+      </h1>
+      <p class="hero-desc hero-anim">
+        Model Context Protocol is the open standard that lets AI models connect to external tools, APIs, and data sources through one unified interface. This is how we built it.
+      </p>
+      <div class="hero-ctas hero-anim">
+        <a href="#what-is-mcp" class="btn btn-outline">Explore</a>
+        <button type="button" class="btn btn-gradient" id="hero-present-btn">Present</button>
       </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-graphic hero-graphic-anim" id="hero-graphic">
+        <div class="orbit-ring orbit-ring-3"></div>
+        <div class="orbit-ring orbit-ring-2"></div>
+        <div class="orbit-ring orbit-ring-1"></div>
+        <div class="orbit-center" id="orbit-center"></div>
+      </div>
+    </div>
+  </section>
 
-      <nav class="sidebar-nav">
-        <div class="nav-group-label">Concepts</div>
-        <a href="#what-is-mcp"       class="nav-item" data-section="what-is-mcp"><span class="nav-icon">◈</span>What is MCP</a>
-        <a href="#how-it-works"      class="nav-item" data-section="how-it-works"><span class="nav-icon">⬡</span>How it Works</a>
-        <a href="#core-capabilities" class="nav-item" data-section="core-capabilities"><span class="nav-icon">⬢</span>Core Capabilities</a>
+  <!-- ── Content Sections ── -->
+  <div class="content-wrap">
 
-        <div class="nav-group-label">Reference</div>
-        <a href="#popular-servers"   class="nav-item" data-section="popular-servers"><span class="nav-icon">◎</span>Popular Servers</a>
-        <a href="#use-cases"         class="nav-item" data-section="use-cases"><span class="nav-icon">◇</span>Use Cases</a>
+    <!-- ── Section 1: What is MCP ── -->
+    <section class="content-section" id="what-is-mcp">
+      <div class="section-eyebrow">01 / Concepts</div>
+      <h2 class="section-title">What is <span class="gradient-text">MCP</span>?</h2>
+      <p class="section-desc">
+        Model Context Protocol is an open standard by Anthropic that lets AI models talk to external tools, APIs, and data sources through one unified interface. Think of it as USB-C for AI integrations.
+      </p>
+      <div class="cards-grid">
+        <div class="glass-card reveal">
+          <div class="card-num">01</div>
+          <div class="card-title">Why does MCP exist?</div>
+          <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. If you wanted Claude to read your files, you built a custom integration. If you wanted it to query your database, you built another one that shared nothing with the first. MCP standardizes how models discover and invoke tools. A server written once works with any MCP-compatible client: Claude CLI, Claude Desktop, Cursor, VS Code, Continue, Zed, and more. If you're already building software with AI, MCP is the layer that lets your AI actually take actions in your environment, not just talk about them.<div class="card-takeaway"><strong>Key takeaway:</strong> Write the server once; every MCP-compatible AI client can use it without any changes.</div></div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">02</div>
+          <div class="card-title">How is it different from a REST API?</div>
+          <div class="card-body">REST APIs are designed for app-to-app communication with a known schema. Your code decides which endpoint to call and when. MCP is designed for AI-to-tool communication: it includes a built-in discovery step where the model queries what tools are available at runtime, then picks which one to call based on the user's request. You don't write the logic that triggers the tool. The model does, based on what the user asked. Your server doesn't need to know anything about the conversation or the model. It just receives a validated tool call and returns a result. Think of REST as a menu where the developer orders; MCP is a menu where the AI orders.<div class="card-takeaway"><strong>Key takeaway:</strong> With REST, your code decides what to call. With MCP, the model decides, based on the user's intent, not a hardcoded condition.</div></div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">03</div>
+          <div class="card-title">Who created it and who supports it?</div>
+          <div class="card-body">Created by Anthropic and open-sourced in late 2024. In under a year it became the de facto standard for AI tool integrations, adopted by Cursor, VS Code Copilot Chat, Continue, Zed, and dozens of other clients. Official SDKs exist for Python and TypeScript, both actively maintained and well-documented. The spec is open and versioned at <a href="https://github.com/modelcontextprotocol" target="_blank" rel="noopener">github.com/modelcontextprotocol</a>. You can read exactly how it works, not just how to use it. The editors you already use support it, so any MCP server you build today works across your whole dev environment without extra setup.<div class="card-takeaway"><strong>Key takeaway:</strong> MCP is young but already the standard. The Python and TypeScript SDKs are all you need to get building.</div></div>
+        </div>
+      </div>
+    </section>
 
-        <div class="nav-group-label">Hands-on</div>
-        <a href="#getting-started"   class="nav-item" data-section="getting-started"><span class="nav-icon">▷</span>Getting Started</a>
-        <a href="#code-examples"     class="nav-item" data-section="code-examples"><span class="nav-icon">〈/〉</span>Code Examples</a>
-      </nav>
-    </aside>
+    <hr class="section-divider" />
 
-    <main class="main" id="main">
-      <div class="content">
-
-        <!-- ── Section 1: What is MCP ── -->
-        <section class="section" id="what-is-mcp">
-          <div class="section-eyebrow">Section 01</div>
-          <div class="section-title">What is <span>MCP</span>?</div>
-          <div class="section-desc">
-            Model Context Protocol is an open standard by Anthropic that lets AI models talk to external tools, APIs, and data sources through one unified interface. Think of it as USB-C for AI integrations.
+    <!-- ── Section 2: How it Works ── -->
+    <section class="content-section" id="how-it-works">
+      <div class="section-eyebrow">02 / Architecture</div>
+      <h2 class="section-title">How it <span class="gradient-text">Works</span></h2>
+      <p class="section-desc">
+        MCP uses a client-server architecture. The AI client connects to one or more servers, each exposing capabilities the model can use mid-conversation.
+      </p>
+      <div class="cards-grid">
+        <div class="glass-card reveal">
+          <div class="card-num">01</div>
+          <div class="card-title">The three layers: Host, Client, Server</div>
+          <div class="card-body">
+            <strong>Host:</strong> the application the user runs (e.g. Claude CLI, Claude Desktop, Cursor). For this class we're using Claude CLI as our primary host. It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
+            <strong>Client:</strong> lives inside the host. Maintains a 1:1 connection with one MCP server, forwards tool calls from the model to the server, and routes results back. Also handled for you by the host app.<br><br>
+            <strong>Server:</strong> a separate process (or remote service) that exposes tools, resources, and prompts. This is what you build. A server can be 30 lines of Python or TypeScript. It runs independently of whatever AI client the user has.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> As a developer, your job is the server. The host and client are handled by whatever AI app the user is already running.</div>
           </div>
-          <div class="cards">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Why does MCP exist?</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">Before MCP, every AI tool integration was a custom one-off build. If you wanted Claude to read your files, you built a custom integration. If you wanted it to query your database, you built another one that shared nothing with the first. MCP standardizes how models discover and invoke tools. A server written once works with any MCP-compatible client: Claude CLI, Claude Desktop, Cursor, VS Code, Continue, Zed, and more. If you're already building software with AI, MCP is the layer that lets your AI actually take actions in your environment, not just talk about them.<div class="card-takeaway"><strong>Key takeaway:</strong> Write the server once; every MCP-compatible AI client can use it without any changes.</div></div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">How is it different from a REST API?</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">REST APIs are designed for app-to-app communication with a known schema. Your code decides which endpoint to call and when. MCP is designed for AI-to-tool communication: it includes a built-in discovery step where the model queries what tools are available at runtime, then picks which one to call based on the user's request. You don't write the logic that triggers the tool. The model does, based on what the user asked. Your server doesn't need to know anything about the conversation or the model. It just receives a validated tool call and returns a result. Think of REST as a menu where the developer orders; MCP is a menu where the AI orders.<div class="card-takeaway"><strong>Key takeaway:</strong> With REST, your code decides what to call. With MCP, the model decides, based on the user's intent, not a hardcoded condition.</div></div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Who created it and who supports it?</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">Created by Anthropic and open-sourced in late 2024. In under a year it became the de facto standard for AI tool integrations, adopted by Cursor, VS Code Copilot Chat, Continue, Zed, and dozens of other clients. Official SDKs exist for Python and TypeScript, both actively maintained and well-documented. The spec is open and versioned at <a href="https://github.com/modelcontextprotocol" target="_blank" rel="noopener" style="font-family:var(--font-code);color:var(--accent);font-size:11px;text-decoration:underline;text-underline-offset:3px;">github.com/modelcontextprotocol</a>. You can read exactly how it works, not just how to use it. The editors you already use support it, so any MCP server you build today works across your whole dev environment without extra setup.<div class="card-takeaway"><strong>Key takeaway:</strong> MCP is young but already the standard. The Python and TypeScript SDKs are all you need to get building.</div></div>
-            </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">02</div>
+          <div class="card-title">Transport types: stdio vs HTTP+SSE</div>
+          <div class="card-body">
+            <strong>stdio:</strong> the host launches your server as a child process and talks to it through stdin/stdout. Used for local servers on the same machine. Zero networking setup: no ports, no auth, no firewall rules. This is what you'll use for development and most practical work.<br><br>
+            <strong>HTTP + SSE:</strong> your server runs as a regular HTTP service. The client connects via Server-Sent Events for streaming responses. Use this when the server needs to run remotely (a deployed API, a shared team tool) or when multiple users need access to the same server at once.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Start with stdio. It's local, needs no config, and works right away. Switch to HTTP+SSE only when you need remote or shared access.</div>
           </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- ── Section 2: How it Works ── -->
-        <section class="section" id="how-it-works">
-          <div class="section-eyebrow">Section 02</div>
-          <div class="section-title">How it <span>Works</span></div>
-          <div class="section-desc">
-            MCP uses a client-server architecture. The AI client connects to one or more servers, each exposing capabilities the model can use mid-conversation.
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">03</div>
+          <div class="card-title">The request flow</div>
+          <div class="card-body">
+            When a user sends a message, here's what happens under the hood:<br><br>
+            1. User sends a message to the AI.<br>
+            2. Model reads the full list of available tools from all connected servers.<br>
+            3. Model decides a tool call is needed and emits a structured tool-call request.<br>
+            4. Client routes the request to the correct MCP server.<br>
+            5. Server executes the tool and returns a result.<br>
+            6. Result is injected back into the model's context as a new message.<br>
+            7. Model generates a final response using the result.<br><br>
+            Your server only ever handles step 5. It receives a validated call and returns a result. The model, host, and client handle everything else.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Your server handles one step: receive a tool call, return a result. Everything else is managed by the client and host.</div>
           </div>
-          <div class="cards">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">The three layers: Host, Client, Server</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Host:</strong> the application the user runs (e.g. Claude CLI, Claude Desktop, Cursor). For this class we're using Claude CLI as our primary host. It manages the user session, renders the conversation UI, and holds one or more clients. You don't build this; you use it.<br><br>
-                <strong style="color:var(--text-mid)">Client:</strong> lives inside the host. Maintains a 1:1 connection with one MCP server, forwards tool calls from the model to the server, and routes results back. Also handled for you by the host app.<br><br>
-                <strong style="color:var(--text-mid)">Server:</strong> a separate process (or remote service) that exposes tools, resources, and prompts. This is what you build. A server can be 30 lines of Python or TypeScript. It runs independently of whatever AI client the user has.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> As a developer, your job is the server. The host and client are handled by whatever AI app the user is already running.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Transport types: stdio vs HTTP+SSE</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">stdio:</strong> the host launches your server as a child process and talks to it through stdin/stdout. Used for local servers on the same machine. Zero networking setup: no ports, no auth, no firewall rules. This is what you'll use for development and most practical work.<br><br>
-                <strong style="color:var(--text-mid)">HTTP + SSE:</strong> your server runs as a regular HTTP service. The client connects via Server-Sent Events for streaming responses. Use this when the server needs to run remotely (a deployed API, a shared team tool) or when multiple users need access to the same server at once.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Start with stdio. It's local, needs no config, and works right away. Switch to HTTP+SSE only when you need remote or shared access.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">The request flow</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                When a user sends a message, here's what happens under the hood:<br><br>
-                1. User sends a message to the AI.<br>
-                2. Model reads the full list of available tools from all connected servers.<br>
-                3. Model decides a tool call is needed and emits a structured tool-call request.<br>
-                4. Client routes the request to the correct MCP server.<br>
-                5. Server executes the tool and returns a result.<br>
-                6. Result is injected back into the model's context as a new message.<br>
-                7. Model generates a final response using the result.<br><br>
-                Your server only ever handles step 5. It receives a validated call and returns a result. The model, host, and client handle everything else.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Your server handles one step: receive a tool call, return a result. Everything else is managed by the client and host.</div>
-              </div>
-            </div>
-          </div>
-        </section>
+        </div>
+      </div>
+    </section>
 
-        <hr class="section-divider" />
+    <hr class="section-divider" />
 
-        <!-- ── Section 3: Core Capabilities ── -->
-        <section class="section" id="core-capabilities">
-          <div class="section-eyebrow">Section 03</div>
-          <div class="section-title">Core <span>Capabilities</span></div>
-          <div class="section-desc">
-            MCP servers expose three primitives. Tools are the most common. Resources and prompts round out the spec for more advanced use cases.
-          </div>
-          <div class="cards">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Tools: functions the model can call</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">A tool is a named function with a description and a JSON Schema defining its inputs. The model reads the description to decide when to use it, then passes validated arguments. It never guesses at input shapes. Tools can do anything: query a database, call an external API, run a shell command, write a file. In Python, you define a tool by decorating a function with <code>@mcp.tool()</code>. The SDK infers the schema from your type hints automatically. About 90% of MCP server development is writing tools. Resources and prompts are optional extras you can add later.<div class="card-takeaway"><strong>Key takeaway:</strong> Tools are the main primitive. If you're building an MCP server, you're almost certainly building tools.</div></div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Resources: read-only context the model can access</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">Resources are identified by a URI (e.g. <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">file:///path/to/doc.txt</code> or <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">db://users/42</code>) and return text or binary content. Resources are passive: the model or host fetches them rather than invoking them with arguments. Think of them as read-only data sources: a config file, a database row, a docs page, a code snippet. They make sense when the data has a stable identifier and doesn't need parameters beyond that ID. In practice, tools are far more common because they're more flexible. But resources are a clean fit when your content maps naturally to a URI.<div class="card-takeaway"><strong>Key takeaway:</strong> Resources give the model read access to named data. Use them when your content has a stable URI and doesn't need arguments beyond an ID.</div></div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Prompts: reusable prompt templates</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">A server can expose named prompt templates with dynamic arguments, like a function that returns a pre-filled conversation starter. The host can surface these as slash-commands or quick actions in the UI (Claude CLI surfaces them when you type <code>/</code>). Prompts make sense when you've got a repeated workflow that always starts the same way: "review this PR", "explain this error log", "summarize this week's issues". They're the least-used of the three primitives. Most servers never define any. Get comfortable building tools first; come back to prompts when you have a concrete repeated workflow to standardize.<div class="card-takeaway"><strong>Key takeaway:</strong> Prompts are optional and uncommon. Master tools first, then revisit these when you have a concrete repeated workflow.</div></div>
-            </div>
-          </div>
-        </section>
+    <!-- ── Section 3: Core Capabilities ── -->
+    <section class="content-section" id="core-capabilities">
+      <div class="section-eyebrow">03 / Primitives</div>
+      <h2 class="section-title">Core <span class="gradient-text">Capabilities</span></h2>
+      <p class="section-desc">
+        MCP servers expose three primitives. Tools are the most common. Resources and prompts round out the spec for more advanced use cases.
+      </p>
+      <div class="cards-grid">
+        <div class="glass-card reveal">
+          <div class="card-num">01</div>
+          <div class="card-title">Tools: functions the model can call</div>
+          <div class="card-body">A tool is a named function with a description and a JSON Schema defining its inputs. The model reads the description to decide when to use it, then passes validated arguments. It never guesses at input shapes. Tools can do anything: query a database, call an external API, run a shell command, write a file. In Python, you define a tool by decorating a function with <code class="inline-code">@mcp.tool()</code>. The SDK infers the schema from your type hints automatically. About 90% of MCP server development is writing tools. Resources and prompts are optional extras you can add later.<div class="card-takeaway"><strong>Key takeaway:</strong> Tools are the main primitive. If you're building an MCP server, you're almost certainly building tools.</div></div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">02</div>
+          <div class="card-title">Resources: read-only context the model can access</div>
+          <div class="card-body">Resources are identified by a URI (e.g. <code class="inline-code">file:///path/to/doc.txt</code> or <code class="inline-code">db://users/42</code>) and return text or binary content. Resources are passive: the model or host fetches them rather than invoking them with arguments. Think of them as read-only data sources: a config file, a database row, a docs page, a code snippet. They make sense when the data has a stable identifier and doesn't need parameters beyond that ID. In practice, tools are far more common because they're more flexible. But resources are a clean fit when your content maps naturally to a URI.<div class="card-takeaway"><strong>Key takeaway:</strong> Resources give the model read access to named data. Use them when your content has a stable URI and doesn't need arguments beyond an ID.</div></div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">03</div>
+          <div class="card-title">Prompts: reusable prompt templates</div>
+          <div class="card-body">A server can expose named prompt templates with dynamic arguments, like a function that returns a pre-filled conversation starter. The host can surface these as slash-commands or quick actions in the UI (Claude CLI surfaces them when you type <code class="inline-code">/</code>). Prompts make sense when you've got a repeated workflow that always starts the same way: "review this PR", "explain this error log", "summarize this week's issues". They're the least-used of the three primitives. Most servers never define any. Get comfortable building tools first; come back to prompts when you have a concrete repeated workflow to standardize.<div class="card-takeaway"><strong>Key takeaway:</strong> Prompts are optional and uncommon. Master tools first, then revisit these when you have a concrete repeated workflow.</div></div>
+        </div>
+      </div>
+    </section>
 
-        <hr class="section-divider" />
+    <hr class="section-divider" />
 
-        <!-- ── Section 4: Popular Servers ── -->
-        <section class="section" id="popular-servers">
-          <div class="section-eyebrow">Section 04</div>
-          <div class="section-title">Popular <span>Servers</span></div>
-          <div class="section-desc">
-            The MCP ecosystem has hundreds of servers. These seven are the most useful for classroom work. Each installs with a single command and covers a distinct capability.
+    <!-- ── Section 4: Popular Servers ── -->
+    <section class="content-section" id="popular-servers">
+      <div class="section-eyebrow">04 / Ecosystem</div>
+      <h2 class="section-title">Popular <span class="gradient-text">Servers</span></h2>
+      <p class="section-desc">
+        The MCP ecosystem has hundreds of servers. These seven are the most useful for classroom work. Each installs with a single command and covers a distinct capability.
+      </p>
+      <div class="cards-grid">
+        <div class="glass-card reveal">
+          <div class="card-num">01</div>
+          <div class="card-title">Filesystem: read and write local files</div>
+          <div class="card-body">
+            The simplest MCP server and the best one to start with. Give it a directory path in the config and Claude gets read/write access to every file inside it: list directories, read file contents, write new files, search by name or content. It's sandboxed to the folder you specify, so you control exactly what Claude can touch. It uses only stdio and needs no API key, which makes it the easiest way to confirm your MCP setup is working before moving on to more complex servers.<br><br>
+            <strong>Classroom use:</strong> Have Claude read your notes folder and summarize what you worked on this week.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-filesystem /path/to/folder</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Start here. No API key needed, and getting it working proves your entire setup is correct.</div>
           </div>
-          <div class="cards">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Filesystem: read and write local files</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                The simplest MCP server and the best one to start with. Give it a directory path in the config and Claude gets read/write access to every file inside it: list directories, read file contents, write new files, search by name or content. It's sandboxed to the folder you specify, so you control exactly what Claude can touch. It uses only stdio and needs no API key, which makes it the easiest way to confirm your MCP setup is working before moving on to more complex servers.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude read your notes folder and summarize what you worked on this week.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-filesystem /path/to/folder</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Start here. No API key needed, and getting it working proves your entire setup is correct.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">GitHub: repos, PRs, issues, and code</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Search repositories, read file contents, list and create pull requests, open issues, post comments, and browse commit history, all from inside Claude. It works on any repo you have access to, public or private. Requires a GitHub personal access token with <code>repo</code> scope. See the API Keys step in Getting Started for how to add it to your config. Once connected, you can ask Claude to review a PR, explain a commit, or draft an issue description without switching apps.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Ask Claude to review your latest PR diff and suggest improvements before you merge.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-github</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> If you only set up one server beyond Filesystem, make it GitHub. It fits right into the workflow you already have.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Postgres: SQL queries against a live database</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Runs read-only SQL queries against a PostgreSQL database and returns results as plain text. Claude can inspect your schema, write queries from plain-English descriptions, explain what existing queries do, and answer questions about your data without you writing a line of SQL. The connection string in your config acts as the credentials. Claude only gets the permissions that connection has, so a read-only user keeps things safe. Great for learning a new codebase's data model fast, or exploring a database you didn't build.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Hand Claude an unfamiliar schema and ask it to explain each table in plain English.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Point Claude at a database and ask questions in plain English. No SQL experience required.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">04</div><div class="card-title">Brave Search: real-time web results</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Queries the Brave Search API for live web results, bypassing Claude's training cutoff. Claude gets page titles, URLs, and descriptions, then synthesizes them into a structured answer. Requires a free Brave Search API key (see the API Keys step in Getting Started). Pair it with the Fetch server for a full research workflow: search returns the URLs, Fetch retrieves the full page text, and Claude synthesizes everything into one response.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Research a topic and have Claude synthesize results from multiple sources in one response.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-brave-search</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Use this when you need Claude to work with information that's newer than its training data.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">05</div><div class="card-title">Puppeteer: browser automation and scraping</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Controls a full headless Chrome browser, not just a plain HTTP fetcher. Claude can navigate to URLs, click buttons, fill forms, wait for JavaScript to finish rendering, take screenshots, and extract structured data from dynamic pages that a simple fetch can't handle. It runs real Chrome, so it works on React apps, infinite-scroll feeds, and any site that relies on JavaScript to render. No API key required.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Scrape a product page for pricing data, or screenshot a dashboard for a weekly report.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-puppeteer</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Reach for Puppeteer when a page uses JavaScript to render its content. A plain Fetch won't work on those.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">06</div><div class="card-title">Slack: messages, channels, and users</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Send and read messages, list channels, look up users, react to messages, and post formatted content to Slack workspaces, all from Claude. Requires a Slack bot token and your team ID set as environment variables (see the API Keys step in Getting Started). You'll need to create a Slack app at api.slack.com/apps, install it to your workspace, and grant it the right bot scopes. Once connected, Claude can draft responses, triage support channels, or post automated summaries.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Have Claude monitor a support channel and draft responses to common questions.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-slack</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Use this to bring Claude into team communication workflows: reading channels and drafting messages without copy-pasting.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">07</div><div class="card-title">Fetch: retrieve content from any URL</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                Fetches raw HTML or plain text from any public URL. No browser, no JavaScript execution. It's the lightest way to pull in content from the web: docs pages, API responses, README files, RSS feeds. It doesn't run JavaScript, so it's fast and simple but only works on pages that render content server-side. No API key required. Pair it with Brave Search for a full research workflow: search returns the URLs, Fetch retrieves the full text.<br><br>
-                <strong style="color:var(--text-mid)">Classroom use:</strong> Point Claude at an API docs page and ask it to write a client based on what it reads.<br><br>
-                <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">npx -y @modelcontextprotocol/server-fetch</code>
-                <div class="card-takeaway"><strong>Key takeaway:</strong> Use Fetch for static and server-rendered pages. Switch to Puppeteer if the page needs JavaScript to load its content.</div>
-              </div>
-            </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">02</div>
+          <div class="card-title">GitHub: repos, PRs, issues, and code</div>
+          <div class="card-body">
+            Search repositories, read file contents, list and create pull requests, open issues, post comments, and browse commit history, all from inside Claude. It works on any repo you have access to, public or private. Requires a GitHub personal access token with <code class="inline-code">repo</code> scope. See the API Keys step in Getting Started for how to add it to your config. Once connected, you can ask Claude to review a PR, explain a commit, or draft an issue description without switching apps.<br><br>
+            <strong>Classroom use:</strong> Ask Claude to review your latest PR diff and suggest improvements before you merge.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-github</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> If you only set up one server beyond Filesystem, make it GitHub. It fits right into the workflow you already have.</div>
           </div>
-        </section>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">03</div>
+          <div class="card-title">Postgres: SQL queries against a live database</div>
+          <div class="card-body">
+            Runs read-only SQL queries against a PostgreSQL database and returns results as plain text. Claude can inspect your schema, write queries from plain-English descriptions, explain what existing queries do, and answer questions about your data without you writing a line of SQL. The connection string in your config acts as the credentials. Claude only gets the permissions that connection has, so a read-only user keeps things safe. Great for learning a new codebase's data model fast, or exploring a database you didn't build.<br><br>
+            <strong>Classroom use:</strong> Hand Claude an unfamiliar schema and ask it to explain each table in plain English.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Point Claude at a database and ask questions in plain English. No SQL experience required.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">04</div>
+          <div class="card-title">Brave Search: real-time web results</div>
+          <div class="card-body">
+            Queries the Brave Search API for live web results, bypassing Claude's training cutoff. Claude gets page titles, URLs, and descriptions, then synthesizes them into a structured answer. Requires a free Brave Search API key (see the API Keys step in Getting Started). Pair it with the Fetch server for a full research workflow: search returns the URLs, Fetch retrieves the full page text, and Claude synthesizes everything into one response.<br><br>
+            <strong>Classroom use:</strong> Research a topic and have Claude synthesize results from multiple sources in one response.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-brave-search</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Use this when you need Claude to work with information that's newer than its training data.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">05</div>
+          <div class="card-title">Puppeteer: browser automation and scraping</div>
+          <div class="card-body">
+            Controls a full headless Chrome browser, not just a plain HTTP fetcher. Claude can navigate to URLs, click buttons, fill forms, wait for JavaScript to finish rendering, take screenshots, and extract structured data from dynamic pages that a simple fetch can't handle. It runs real Chrome, so it works on React apps, infinite-scroll feeds, and any site that relies on JavaScript to render. No API key required.<br><br>
+            <strong>Classroom use:</strong> Scrape a product page for pricing data, or screenshot a dashboard for a weekly report.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-puppeteer</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Reach for Puppeteer when a page uses JavaScript to render its content. A plain Fetch won't work on those.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">06</div>
+          <div class="card-title">Slack: messages, channels, and users</div>
+          <div class="card-body">
+            Send and read messages, list channels, look up users, react to messages, and post formatted content to Slack workspaces, all from Claude. Requires a Slack bot token and your team ID set as environment variables (see the API Keys step in Getting Started). You'll need to create a Slack app at api.slack.com/apps, install it to your workspace, and grant it the right bot scopes. Once connected, Claude can draft responses, triage support channels, or post automated summaries.<br><br>
+            <strong>Classroom use:</strong> Have Claude monitor a support channel and draft responses to common questions.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-slack</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Use this to bring Claude into team communication workflows: reading channels and drafting messages without copy-pasting.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">07</div>
+          <div class="card-title">Fetch: retrieve content from any URL</div>
+          <div class="card-body">
+            Fetches raw HTML or plain text from any public URL. No browser, no JavaScript execution. It's the lightest way to pull in content from the web: docs pages, API responses, README files, RSS feeds. It doesn't run JavaScript, so it's fast and simple but only works on pages that render content server-side. No API key required. Pair it with Brave Search for a full research workflow: search returns the URLs, Fetch retrieves the full text.<br><br>
+            <strong>Classroom use:</strong> Point Claude at an API docs page and ask it to write a client based on what it reads.<br><br>
+            <code class="inline-code">npx -y @modelcontextprotocol/server-fetch</code>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Use Fetch for static and server-rendered pages. Switch to Puppeteer if the page needs JavaScript to load its content.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <hr class="section-divider" />
+    <hr class="section-divider" />
 
-        <!-- ── Section 5: Use Cases ── -->
-        <section class="section" id="use-cases">
-          <div class="section-eyebrow">Section 05</div>
-          <div class="section-title">Use <span>Cases</span></div>
-          <div class="section-desc">
-            MCP servers get interesting when you combine them. These scenarios show how pairing the right servers with Claude solves real problems you'd otherwise grind through by hand.
+    <!-- ── Section 5: Use Cases ── -->
+    <section class="content-section" id="use-cases">
+      <div class="section-eyebrow">05 / Applications</div>
+      <h2 class="section-title">Use <span class="gradient-text">Cases</span></h2>
+      <p class="section-desc">
+        MCP servers get interesting when you combine them. These scenarios show how pairing the right servers with Claude solves real problems you'd otherwise grind through by hand.
+      </p>
+      <div class="cards-grid">
+        <div class="glass-card reveal">
+          <div class="card-num">01</div>
+          <div class="card-title">Research Assistant</div>
+          <div class="card-body">
+            <strong>Problem:</strong> You need to research a topic across multiple sources and synthesize findings without copy-pasting from tab to tab.<br><br>
+            <strong>Servers:</strong> Brave Search + Fetch<br><br>
+            <strong>Outcome:</strong> Claude runs the search, fetches the full text of the top 3&ndash;5 results, cross-references them, and returns a structured summary with source citations, all in a single response. What normally takes 20 minutes of tab-switching takes under 30 seconds. The citations are real URLs you can verify yourself.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: search &rarr; fetch &rarr; synthesize. One prompt replaces an entire manual research session.</div>
           </div>
-          <div class="cards">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">01</div><div class="card-title">Research Assistant</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Problem:</strong> You need to research a topic across multiple sources and synthesize findings without copy-pasting from tab to tab.<br><br>
-                <strong style="color:var(--text-mid)">Servers:</strong> Brave Search + Fetch<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude runs the search, fetches the full text of the top 3–5 results, cross-references them, and returns a structured summary with source citations, all in a single response. What normally takes 20 minutes of tab-switching takes under 30 seconds. The citations are real URLs you can verify yourself.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: search → fetch → synthesize. One prompt replaces an entire manual research session.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">02</div><div class="card-title">Code Reviewer</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Problem:</strong> You want AI feedback on a pull request without pasting the whole diff into a chat window.<br><br>
-                <strong style="color:var(--text-mid)">Server:</strong> GitHub<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude fetches the PR diff directly from GitHub, reads the changed files and their surrounding context, and returns structured review comments organized by file, pointing to specific lines. You get the same output as a human code review: what changed, what could break, what edge cases weren't handled. The feedback references real line numbers because it's reading the actual diff, not paraphrasing it.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: fetch diff → analyze changes → structured output. Claude reviews your PR the same way a teammate would.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">03</div><div class="card-title">Database Explorer</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Problem:</strong> A teammate handed you a Postgres database with no documentation and you need to understand it fast.<br><br>
-                <strong style="color:var(--text-mid)">Server:</strong> Postgres<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude queries the schema, describes each table in plain English, and maps out the relationships between them. It loaded the full schema in its first query, so you can ask follow-up questions like "which table tracks user sessions?" or "write a query that joins orders to users" and it already has the context to answer accurately. No copy-pasting schema dumps required.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read schema → answer questions in plain English. No documentation needed to understand an unfamiliar database.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">04</div><div class="card-title">Web Scraper</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Problem:</strong> You need structured data from a website that doesn't offer an API.<br><br>
-                <strong style="color:var(--text-mid)">Server:</strong> Puppeteer<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude navigates to the page, waits for JavaScript to render, extracts the specific data you described (prices, names, dates, links), and returns it as a clean structured table. You can ask it to handle pagination, filter by criteria, or scrape multiple pages, all in plain English. The output is ready to paste into a spreadsheet or feed into another script.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: navigate → wait → extract → structure. Describe the data you want in plain English; Claude handles the scraping logic.</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header">
-                <div class="card-header-left"><div class="card-num">05</div><div class="card-title">Team Automator</div></div>
-                <div class="card-chevron">▶</div>
-              </div>
-              <div class="card-body">
-                <strong style="color:var(--text-mid)">Problem:</strong> New GitHub issues pile up and it takes time to triage them, assign labels, and notify the team.<br><br>
-                <strong style="color:var(--text-mid)">Servers:</strong> GitHub + Slack<br><br>
-                <strong style="color:var(--text-mid)">Outcome:</strong> Claude reads every open issue, categorizes them by type (bug, feature request, question, docs), estimates priority based on the description and reactions, posts a formatted triage summary to a Slack channel, and suggests label assignments, all from a single prompt. What normally takes a 15-minute triage meeting becomes a one-liner. You review the suggestions, apply what looks right, and move on.
-                <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read → categorize → act across systems. Combining two servers turns a manual recurring workflow into a single prompt.</div>
-              </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">02</div>
+          <div class="card-title">Code Reviewer</div>
+          <div class="card-body">
+            <strong>Problem:</strong> You want AI feedback on a pull request without pasting the whole diff into a chat window.<br><br>
+            <strong>Server:</strong> GitHub<br><br>
+            <strong>Outcome:</strong> Claude fetches the PR diff directly from GitHub, reads the changed files and their surrounding context, and returns structured review comments organized by file, pointing to specific lines. You get the same output as a human code review: what changed, what could break, what edge cases weren't handled. The feedback references real line numbers because it's reading the actual diff, not paraphrasing it.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: fetch diff &rarr; analyze changes &rarr; structured output. Claude reviews your PR the same way a teammate would.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">03</div>
+          <div class="card-title">Database Explorer</div>
+          <div class="card-body">
+            <strong>Problem:</strong> A teammate handed you a Postgres database with no documentation and you need to understand it fast.<br><br>
+            <strong>Server:</strong> Postgres<br><br>
+            <strong>Outcome:</strong> Claude queries the schema, describes each table in plain English, and maps out the relationships between them. It loaded the full schema in its first query, so you can ask follow-up questions like "which table tracks user sessions?" or "write a query that joins orders to users" and it already has the context to answer accurately. No copy-pasting schema dumps required.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read schema &rarr; answer questions in plain English. No documentation needed to understand an unfamiliar database.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">04</div>
+          <div class="card-title">Web Scraper</div>
+          <div class="card-body">
+            <strong>Problem:</strong> You need structured data from a website that doesn't offer an API.<br><br>
+            <strong>Server:</strong> Puppeteer<br><br>
+            <strong>Outcome:</strong> Claude navigates to the page, waits for JavaScript to render, extracts the specific data you described (prices, names, dates, links), and returns it as a clean structured table. You can ask it to handle pagination, filter by criteria, or scrape multiple pages, all in plain English. The output is ready to paste into a spreadsheet or feed into another script.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: navigate &rarr; wait &rarr; extract &rarr; structure. Describe the data you want in plain English; Claude handles the scraping logic.</div>
+          </div>
+        </div>
+        <div class="glass-card reveal">
+          <div class="card-num">05</div>
+          <div class="card-title">Team Automator</div>
+          <div class="card-body">
+            <strong>Problem:</strong> New GitHub issues pile up and it takes time to triage them, assign labels, and notify the team.<br><br>
+            <strong>Servers:</strong> GitHub + Slack<br><br>
+            <strong>Outcome:</strong> Claude reads every open issue, categorizes them by type (bug, feature request, question, docs), estimates priority based on the description and reactions, posts a formatted triage summary to a Slack channel, and suggests label assignments, all from a single prompt. What normally takes a 15-minute triage meeting becomes a one-liner. You review the suggestions, apply what looks right, and move on.
+            <div class="card-takeaway"><strong>Key takeaway:</strong> The pattern: read &rarr; categorize &rarr; act across systems. Combining two servers turns a manual recurring workflow into a single prompt.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ── Section 6: Getting Started ── -->
+    <section class="content-section" id="getting-started">
+      <div class="section-eyebrow">06 / Hands-on</div>
+      <h2 class="section-title">Getting <span class="gradient-text">Started</span></h2>
+      <p class="section-desc">
+        Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately. If you prefer a GUI, Claude Desktop supports the same servers &mdash; the servers section of this guide covers both.
+      </p>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Install Claude CLI</div>
+            <div class="step-desc">If you haven't already, install Claude CLI via npm. This is the host that manages your MCP connections.
+              <code class="code-block">npm install -g @anthropic-ai/claude-code</code>
+              Then log in:
+              <code class="code-block">claude</code>
+              Follow the prompts to authenticate with your Anthropic account.<br><br>
+              <strong>Prefer a GUI?</strong> Claude Desktop (anthropic.com/download) supports the same MCP servers. Configuration lives in a JSON file instead of the CLI &mdash; the pattern is the same, just a different interface.
             </div>
           </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- ── Section 6: Getting Started ── -->
-        <section class="section" id="getting-started">
-          <div class="section-eyebrow">Section 06</div>
-          <div class="section-title">Getting <span>Started</span></div>
-          <div class="section-desc">
-            Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately. If you prefer a GUI, Claude Desktop supports the same servers — the servers section of this guide covers both.
-          </div>
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-content">
-                <div class="step-title">Install Claude CLI</div>
-                <div class="step-desc">If you haven't already, install Claude CLI via npm. This is the host that manages your MCP connections.
-                  <code class="code-block">npm install -g @anthropic-ai/claude-code</code>
-                  Then log in:
-                  <code class="code-block">claude</code>
-                  Follow the prompts to authenticate with your Anthropic account.<br><br>
-                  <strong style="color:var(--text-mid)">Prefer a GUI?</strong> Claude Desktop (anthropic.com/download) supports the same MCP servers. Configuration lives in a JSON file instead of the CLI — the pattern is the same, just a different interface.
-                </div>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-content">
-                <div class="step-title">Add the Filesystem server</div>
-                <div class="step-desc">
-                  Run this command to connect the Filesystem server. Replace <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">~/Documents</code> with the folder you want Claude to access.
-                  <code class="code-block">claude mcp add filesystem npx -y @modelcontextprotocol/server-filesystem ~/Documents</code>
-                  That's it. No config file to edit, no restart needed.
-                </div>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-content">
-                <div class="step-title">Handle API keys</div>
-                <div class="step-desc">
-                  Some servers need an API key. Pass them with the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">-e</code> flag — never hardcode them in the command itself.
-                  <code class="code-block">claude mcp add brave-search -e BRAVE_API_KEY=your-key-here npx -y @modelcontextprotocol/server-brave-search</code>
-                  <strong style="color:var(--text-mid)">Where to get keys for common servers</strong><br>
-                  <strong>GitHub:</strong> github.com → Settings → Developer settings → Personal access tokens → Tokens (classic). Select the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">repo</code> scope.<br>
-                  <strong>Brave Search:</strong> brave.com/search/api. Free tier includes 2,000 queries/month.<br>
-                  <strong>Slack:</strong> api.slack.com/apps. Create an app, install it to your workspace, and copy the Bot User OAuth Token.
-                </div>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">4</div>
-              <div class="step-content">
-                <div class="step-title">Verify it's working</div>
-                <div class="step-desc">
-                  Check your connected servers:
-                  <code class="code-block">claude mcp list</code>
-                  You should see <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">filesystem</code> listed. Then start a chat and test it:
-                  <code class="code-block">claude</code>
-                  Type: <em>"List the files in my Documents folder."</em> Claude should call the <code style="font-family:var(--font-code);color:var(--accent);font-size:11px">list_directory</code> tool and return the results. You'll see the tool call appear inline before the response.
-                </div>
-              </div>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Add the Filesystem server</div>
+            <div class="step-desc">
+              Run this command to connect the Filesystem server. Replace <code class="inline-code">~/Documents</code> with the folder you want Claude to access.
+              <code class="code-block">claude mcp add filesystem npx -y @modelcontextprotocol/server-filesystem ~/Documents</code>
+              That's it. No config file to edit, no restart needed.
             </div>
           </div>
-          <div class="section-takeaway"><strong>Key takeaway:</strong> Once you've done this once, adding new servers is just one <code style="font-family:var(--font-code);color:var(--accent-2);font-size:12px">claude mcp add</code> command. The pattern never changes.</div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- ── Section 7: Code Examples ── -->
-        <section class="section" id="code-examples">
-          <div class="section-eyebrow">Section 07</div>
-          <div class="section-title">Code <span>Examples</span></div>
-          <div class="section-desc">
-            A minimal MCP server with one tool: <code style="font-family:var(--font-code);color:var(--accent);font-size:12px">search_web(query)</code>. It calls the Brave Search API and returns the top five results. Pick your language. The structure is identical in both. Every MCP server follows three steps: <strong>(1)</strong> instantiate a server with a name, <strong>(2)</strong> register one or more tools with a name, description, and input schema, <strong>(3)</strong> connect a transport and run. The description you write for a tool is what the model reads to decide when to call it. Write it like a clear function comment.
-          </div>
-          <div class="tab-group">
-            <div class="tabs">
-              <button type="button" class="tab-btn active" data-lang="python">Python</button>
-              <button type="button" class="tab-btn" data-lang="typescript">TypeScript</button>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Handle API keys</div>
+            <div class="step-desc">
+              Some servers need an API key. Pass them with the <code class="inline-code">-e</code> flag &mdash; never hardcode them in the command itself.
+              <code class="code-block">claude mcp add brave-search -e BRAVE_API_KEY=your-key-here npx -y @modelcontextprotocol/server-brave-search</code>
+              <strong>Where to get keys for common servers</strong><br>
+              <strong>GitHub:</strong> github.com &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Tokens (classic). Select the <code class="inline-code">repo</code> scope.<br>
+              <strong>Brave Search:</strong> brave.com/search/api. Free tier includes 2,000 queries/month.<br>
+              <strong>Slack:</strong> api.slack.com/apps. Create an app, install it to your workspace, and copy the Bot User OAuth Token.
             </div>
-            <div class="tab-panel active" data-lang="python">
-              <div class="code-block-label">Install: pip install mcp httpx</div>
-              <code class="code-block">import httpx
+          </div>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Verify it's working</div>
+            <div class="step-desc">
+              Check your connected servers:
+              <code class="code-block">claude mcp list</code>
+              You should see <code class="inline-code">filesystem</code> listed. Then start a chat and test it:
+              <code class="code-block">claude</code>
+              Type: <em>"List the files in my Documents folder."</em> Claude should call the <code class="inline-code">list_directory</code> tool and return the results. You'll see the tool call appear inline before the response.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-takeaway"><strong>Key takeaway:</strong> Once you've done this once, adding new servers is just one <code class="inline-code">claude mcp add</code> command. The pattern never changes.</div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ── Section 7: Code Examples ── -->
+    <section class="content-section" id="code-examples">
+      <div class="section-eyebrow">07 / Build</div>
+      <h2 class="section-title">Code <span class="gradient-text">Examples</span></h2>
+      <p class="section-desc">
+        A minimal MCP server with one tool: <code class="inline-code">search_web(query)</code>. It calls the Brave Search API and returns the top five results. Pick your language. The structure is identical in both. Every MCP server follows three steps: <strong>(1)</strong> instantiate a server with a name, <strong>(2)</strong> register one or more tools with a name, description, and input schema, <strong>(3)</strong> connect a transport and run. The description you write for a tool is what the model reads to decide when to call it. Write it like a clear function comment.
+      </p>
+      <div class="glass-card reveal">
+        <div class="tab-group">
+          <div class="tabs">
+            <button type="button" class="tab-btn active" data-lang="python">Python</button>
+            <button type="button" class="tab-btn" data-lang="typescript">TypeScript</button>
+          </div>
+          <div class="tab-panel active" data-lang="python">
+            <div class="code-block-label">Install: pip install mcp httpx</div>
+            <code class="code-block">import httpx
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("brave-search")
@@ -1568,10 +1286,10 @@ def search_web(query: str) -> str:
 
 if __name__ == "__main__":
     mcp.run()</code>
-            </div>
-            <div class="tab-panel" data-lang="typescript">
-              <div class="code-block-label">Install: npm install @modelcontextprotocol/sdk zod</div>
-              <code class="code-block">import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+          </div>
+          <div class="tab-panel" data-lang="typescript">
+            <div class="code-block-label">Install: npm install @modelcontextprotocol/sdk zod</div>
+            <code class="code-block">import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
@@ -1605,98 +1323,19 @@ server.tool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport); // requires "type":"module" in package.json</code>
-            </div>
           </div>
-          <div class="section-takeaway"><strong>Key takeaway:</strong> Every MCP server follows the same three-part structure: instantiate, register tools, connect transport. Swap in different tool logic and it works for any use case.</div>
-        </section>
-
+        </div>
       </div>
-    </main>
+      <div class="section-takeaway"><strong>Key takeaway:</strong> Every MCP server follows the same three-part structure: instantiate, register tools, connect transport. Swap in different tool logic and it works for any use case.</div>
+    </section>
+
   </div>
+
+  <!-- ── Presentation Mode Containers ── -->
+  <div class="slide-container" id="slide-container"></div>
+  <div class="pres-progress" id="pres-progress"></div>
+
   <script>
-    // Subtle cursor animation for pointer devices
-    function initCursor() {
-      if (!window.matchMedia('(pointer: fine)').matches) return;
-
-      const dot = document.querySelector('.cursor-dot');
-      const ring = document.querySelector('.cursor-ring');
-      if (!dot || !ring) return;
-
-      let mouseX = window.innerWidth / 2;
-      let mouseY = window.innerHeight / 2;
-      let ringX = mouseX;
-      let ringY = mouseY;
-
-      document.body.classList.add('cursor-ready');
-
-      window.addEventListener('mousemove', event => {
-        mouseX = event.clientX;
-        mouseY = event.clientY;
-        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-      });
-
-      window.addEventListener('mouseout', event => {
-        if (!event.relatedTarget) document.body.classList.remove('cursor-ready');
-      });
-
-      window.addEventListener('mouseover', () => {
-        document.body.classList.add('cursor-ready');
-      });
-
-      document.querySelectorAll('a, button, .card').forEach(target => {
-        target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-        target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-      });
-
-      function animateCursor() {
-        ringX += (mouseX - ringX) * 0.18;
-        ringY += (mouseY - ringY) * 0.18;
-        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
-        requestAnimationFrame(animateCursor);
-      }
-
-      animateCursor();
-    }
-    initCursor();
-
-    // Accordion — one card open at a time globally
-    function initAccordion() {
-      document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', () => {
-          const isOpen = card.classList.contains('open');
-          const openCards = [...document.querySelectorAll('.card.open')];
-          openCards.forEach(c => c.classList.remove('open'));
-          if (!isOpen) {
-            setTimeout(() => card.classList.add('open'), openCards.length ? 80 : 0);
-          }
-        });
-      });
-    }
-    initAccordion();
-
-    // Tab switcher
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const group = btn.closest('.tab-group');
-        group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        group.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        group.querySelector(`.tab-panel[data-lang="${btn.dataset.lang}"]`).classList.add('active');
-      });
-    });
-
-    // Scroll-spy
-    const navItems = document.querySelectorAll('.nav-item[data-section]');
-    const spy = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          navItems.forEach(item => item.classList.remove('active'));
-          const hit = document.querySelector(`.nav-item[data-section="${entry.target.id}"]`);
-          if (hit) hit.classList.add('active');
-        }
-      });
-    }, { threshold: 0, rootMargin: "-40% 0px -55% 0px" });
-    document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
   </script>
 </body>
 </html>
