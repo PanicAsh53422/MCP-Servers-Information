@@ -44,7 +44,7 @@
     a { color: inherit; }
 
     /* ── Canvas ── */
-    #bg-canvas {
+    #particle-canvas {
       position: fixed;
       inset: 0;
       z-index: 0;
@@ -868,7 +868,7 @@
   </style>
 </head>
 <body>
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
 
   <!-- ── Top Navigation ── -->
   <nav class="top-nav" id="top-nav">
@@ -920,11 +920,13 @@
       </div>
     </div>
     <div class="hero-right">
-      <div class="hero-graphic hero-graphic-anim" id="hero-graphic">
-        <div class="orbit-ring orbit-ring-3"></div>
-        <div class="orbit-ring orbit-ring-2"></div>
-        <div class="orbit-ring orbit-ring-1"></div>
-        <div class="orbit-center" id="orbit-center"></div>
+      <div class="hero-graphic hero-graphic-anim" style="transition-delay:0.5s">
+        <div class="orbital-container" id="orbital">
+          <div class="orbit-ring orbit-ring-3"></div>
+          <div class="orbit-ring orbit-ring-2"></div>
+          <div class="orbit-ring orbit-ring-1"></div>
+          <div class="orbit-center"></div>
+        </div>
       </div>
     </div>
   </section>
