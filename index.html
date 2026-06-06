@@ -1462,6 +1462,151 @@ await server.connect(transport); // requires "type":"module" in package.json</co
     }
     frame();
   })();
+
+  // ── Hero Orbital Animation ──
+  (function initOrbital() {
+    const container = document.getElementById('orbital');
+    if (!container) return;
+
+    const nodes = [
+      { radius: 80, speed: 0.008, offset: 0, color: '#38bdf8', label: 'TOOLS' },
+      { radius: 80, speed: 0.008, offset: Math.PI, color: '#a855f7', label: 'RESOURCES' },
+      { radius: 130, speed: -0.005, offset: 0.5, color: '#38bdf8', label: 'PROMPTS' },
+      { radius: 130, speed: -0.005, offset: 2.6, color: '#a855f7', label: 'APIS' },
+      { radius: 180, speed: 0.003, offset: 1, color: '#38bdf8', label: 'DATA' },
+      { radius: 180, speed: 0.003, offset: 3.5, color: '#a855f7', label: 'MODELS' },
+    ];
+
+    const nodeEls = [];
+    const labelEls = [];
+
+    nodes.forEach(n => {
+      const el = document.createElement('div');
+      el.style.cssText = 'position:absolute;width:10px;height:10px;border-radius:50%;background:' + n.color + ';box-shadow:0 0 12px ' + n.color + ';';
+      container.appendChild(el);
+      nodeEls.push(el);
+
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'position:absolute;white-space:nowrap;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.25);pointer-events:none;';
+      lbl.textContent = n.label;
+      container.appendChild(lbl);
+      labelEls.push(lbl);
+    });
+
+    const pulses = [];
+    for (let i = 0; i < 3; i++) {
+      const el = document.createElement('div');
+      el.style.cssText = 'position:absolute;width:4px;height:4px;border-radius:50%;background:' + '#38bdf8' + ';box-shadow:0 0 8px ' + '#38bdf8' + ';opacity:0;';
+      container.appendChild(el);
+      pulses.push({ el, fromIdx: 0, toIdx: 1, progress: Math.random(), speed: 0.005 + Math.random() * 0.005 });
+    }
+
+    let t = 0;
+    function animate() {
+      t++;
+      const cx = container.offsetWidth / 2;
+      const cy = container.offsetHeight / 2;
+
+      nodes.forEach((n, i) => {
+        const angle = n.offset + t * n.speed;
+        const x = cx + Math.cos(angle) * n.radius;
+        const y = cy + Math.sin(angle) * n.radius;
+        nodeEls[i].style.left = (x - 5) + 'px';
+        nodeEls[i].style.top = (y - 5) + 'px';
+        labelEls[i].style.left = (x + 14) + 'px';
+        labelEls[i].style.top = (y - 6) + 'px';
+      });
+
+      pulses.forEach(p => {
+        p.progress += p.speed;
+        if (p.progress >= 1) {
+          p.progress = 0;
+          p.fromIdx = Math.floor(Math.random() * nodes.length);
+          p.toIdx = (p.fromIdx + 1 + Math.floor(Math.random() * (nodes.length - 1))) % nodes.length;
+        }
+        const fx = parseFloat(nodeEls[p.fromIdx].style.left) + 5;
+        const fy = parseFloat(nodeEls[p.fromIdx].style.top) + 5;
+        const tx = parseFloat(nodeEls[p.toIdx].style.left) + 5;
+        const ty = parseFloat(nodeEls[p.toIdx].style.top) + 5;
+        p.el.style.left = (fx + (tx - fx) * p.progress - 2) + 'px';
+        p.el.style.top = (fy + (ty - fy) * p.progress - 2) + 'px';
+        p.el.style.opacity = Math.sin(p.progress * Math.PI) * 0.8;
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+  // ── Hero Load Animation ──
+  (function initHeroAnim() {
+    window.addEventListener('load', function() {
+      document.querySelectorAll('.hero-anim').forEach(function(el) {
+        var delay = parseFloat(el.style.transitionDelay) || 0;
+        setTimeout(function() { el.classList.add('loaded'); }, delay * 1000);
+      });
+      document.querySelectorAll('.hero-graphic-anim').forEach(function(el) {
+        var delay = parseFloat(el.style.transitionDelay) || 0;
+        setTimeout(function() { el.classList.add('loaded'); }, delay * 1000);
+      });
+    });
+  })();
+
+  // ── Scroll Reveal ──
+  (function initReveal() {
+    var reveals = document.querySelectorAll('.reveal');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          var section = el.closest('.section') || el.closest('.hero');
+          var siblings = section ? Array.from(section.querySelectorAll('.reveal')) : [el];
+          var idx = siblings.indexOf(el);
+          el.style.transitionDelay = (idx * 0.1) + 's';
+          el.classList.add('visible');
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(function(el) { observer.observe(el); });
+  })();
+
+  // ── Scroll Spy ──
+  (function initScrollSpy() {
+    var navLinks = document.querySelectorAll('.nav-link[data-section]');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          navLinks.forEach(function(link) { link.classList.remove('active'); });
+          var hit = document.querySelector('.nav-link[data-section="' + entry.target.id + '"]');
+          if (hit) hit.classList.add('active');
+        }
+      });
+    }, { threshold: 0, rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('section.section[id]').forEach(function(s) { observer.observe(s); });
+  })();
+
+  // ── Tab Switcher ──
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var group = btn.closest('.tab-group');
+      group.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      group.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      group.querySelector('.tab-panel[data-lang="' + btn.dataset.lang + '"]').classList.add('active');
+    });
+  });
+
+  // ── Hamburger Menu ──
+  (function initHamburger() {
+    var btn = document.getElementById('nav-hamburger');
+    var nav = document.getElementById('mobile-nav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', function() { nav.classList.toggle('open'); });
+    nav.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() { nav.classList.remove('open'); });
+    });
+  })();
   </script>
 </body>
 </html>
