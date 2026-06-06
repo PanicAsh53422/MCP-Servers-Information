@@ -1607,6 +1607,237 @@ await server.connect(transport); // requires "type":"module" in package.json</co
       a.addEventListener('click', function() { nav.classList.remove('open'); });
     });
   })();
+
+  // ── Presentation Mode ──
+  (function initPresentation() {
+    var container = document.getElementById('slide-container');
+    var progress = document.getElementById('pres-progress');
+    var presentBtn = document.getElementById('present-btn');
+    var heroPresentBtn = document.getElementById('hero-present-btn');
+    var topNav = document.querySelector('.top-nav');
+    if (!container || !progress) return;
+
+    var sectionIds = ['hero', 'what-is-mcp', 'how-it-works', 'core-capabilities', 'popular-servers', 'use-cases', 'getting-started', 'code-examples'];
+    var DISSOLVE_TRANSITIONS = [[0, 1], [3, 4]];
+    var slides = [];
+    var currentSlide = 0;
+    var isPresenting = false;
+    var transitioning = false;
+    var cursorTimer = null;
+
+    function buildSlides() {
+      container.innerHTML = '';
+      progress.innerHTML = '';
+      slides = [];
+
+      sectionIds.forEach(function(id, i) {
+        var source = document.getElementById(id);
+        if (!source) return;
+
+        var slide = document.createElement('div');
+        slide.className = 'slide';
+        slide.dataset.index = i;
+
+        var content = document.createElement('div');
+        content.style.maxWidth = '1200px';
+        content.style.width = '100%';
+        content.style.padding = '0 48px';
+        content.innerHTML = source.innerHTML;
+
+        content.querySelectorAll('.reveal').forEach(function(el) {
+          el.classList.add('visible');
+          el.style.transitionDelay = '0s';
+        });
+
+        slide.appendChild(content);
+        container.appendChild(slide);
+        slides.push(slide);
+
+        var dot = document.createElement('div');
+        dot.className = 'pres-dot';
+        dot.addEventListener('click', function() { goToSlide(i); });
+        progress.appendChild(dot);
+      });
+
+      var counter = document.createElement('span');
+      counter.className = 'pres-counter';
+      counter.id = 'pres-counter';
+      progress.appendChild(counter);
+    }
+
+    function updateProgress() {
+      var dots = progress.querySelectorAll('.pres-dot');
+      dots.forEach(function(dot, i) {
+        dot.classList.toggle('active', i === currentSlide);
+      });
+      var counter = document.getElementById('pres-counter');
+      if (counter) counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+    }
+
+    function isDissolveTransition(from, to) {
+      return DISSOLVE_TRANSITIONS.some(function(pair) {
+        return pair[0] === from && pair[1] === to;
+      });
+    }
+
+    function getAnimatableElements(slide) {
+      return slide.querySelectorAll('.glass-card, .step-card, .section-header, .hero-left, .hero-right, .tab-group, .section-takeaway, .card-takeaway');
+    }
+
+    function staggerRevealIn(slide) {
+      var els = getAnimatableElements(slide);
+      els.forEach(function(el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'none';
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            el.style.transition = 'opacity 0.5s ease-out ' + (i * 0.1) + 's, transform 0.5s ease-out ' + (i * 0.1) + 's';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          });
+        });
+      });
+    }
+
+    function dissolveOut(slide, callback) {
+      var els = getAnimatableElements(slide);
+      els.forEach(function(el, i) {
+        var dx = (Math.random() - 0.5) * 400;
+        var dy = (Math.random() - 0.5) * 400;
+        var dr = (Math.random() - 0.5) * 30;
+        el.style.transition = 'opacity 0.5s ease-out ' + (i * 0.05) + 's, transform 0.5s ease-out ' + (i * 0.05) + 's';
+        el.style.opacity = '0';
+        el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + dr + 'deg)';
+      });
+      setTimeout(callback, 550);
+    }
+
+    function dissolveIn(slide) {
+      var els = getAnimatableElements(slide);
+      els.forEach(function(el, i) {
+        var dx = (Math.random() - 0.5) * 400;
+        var dy = (Math.random() - 0.5) * 400;
+        var dr = (Math.random() - 0.5) * 30;
+        el.style.opacity = '0';
+        el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + dr + 'deg)';
+        el.style.transition = 'none';
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            el.style.transition = 'opacity 0.6s ease-out ' + (i * 0.08) + 's, transform 0.6s ease-out ' + (i * 0.08) + 's';
+            el.style.opacity = '1';
+            el.style.transform = 'translate(0, 0) rotate(0deg)';
+          });
+        });
+      });
+    }
+
+    function goToSlide(idx) {
+      if (transitioning || idx === currentSlide || idx < 0 || idx >= slides.length) return;
+      transitioning = true;
+
+      var from = currentSlide;
+      var to = idx;
+      var useDissolve = isDissolveTransition(from, to);
+      var oldSlide = slides[from];
+      var newSlide = slides[to];
+
+      if (useDissolve) {
+        dissolveOut(oldSlide, function() {
+          oldSlide.classList.remove('active');
+          newSlide.classList.add('active');
+          setTimeout(function() {
+            dissolveIn(newSlide);
+            setTimeout(function() { transitioning = false; }, 700);
+          }, 200);
+        });
+      } else {
+        oldSlide.classList.add('exiting');
+        oldSlide.classList.remove('active');
+        setTimeout(function() {
+          oldSlide.classList.remove('exiting');
+          newSlide.classList.add('active');
+          staggerRevealIn(newSlide);
+          setTimeout(function() { transitioning = false; }, 600);
+        }, 400);
+      }
+
+      currentSlide = to;
+      updateProgress();
+    }
+
+    function enterPresentation() {
+      if (isPresenting) return;
+      isPresenting = true;
+      buildSlides();
+      document.body.classList.add('presenting');
+      if (topNav) topNav.classList.add('hidden');
+      currentSlide = 0;
+      if (slides.length > 0) {
+        slides[0].classList.add('active');
+        staggerRevealIn(slides[0]);
+      }
+      updateProgress();
+      startCursorHide();
+    }
+
+    function exitPresentation() {
+      if (!isPresenting) return;
+      isPresenting = false;
+      document.body.classList.remove('presenting');
+      document.body.classList.remove('cursor-hidden');
+      if (topNav) topNav.classList.remove('hidden');
+      container.innerHTML = '';
+      progress.innerHTML = '';
+      slides = [];
+      stopCursorHide();
+    }
+
+    function resetCursorTimer() {
+      document.body.classList.remove('cursor-hidden');
+      clearTimeout(cursorTimer);
+      cursorTimer = setTimeout(function() {
+        if (isPresenting) document.body.classList.add('cursor-hidden');
+      }, 3000);
+    }
+
+    function startCursorHide() {
+      document.addEventListener('mousemove', resetCursorTimer);
+      resetCursorTimer();
+    }
+
+    function stopCursorHide() {
+      document.removeEventListener('mousemove', resetCursorTimer);
+      clearTimeout(cursorTimer);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (!isPresenting) {
+        if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+          e.preventDefault();
+          enterPresentation();
+        }
+        if (e.key === 'F5') {
+          e.preventDefault();
+          enterPresentation();
+        }
+        return;
+      }
+      if (e.key === 'Escape') {
+        exitPresentation();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        goToSlide(currentSlide - 1);
+      }
+    });
+
+    if (presentBtn) presentBtn.addEventListener('click', enterPresentation);
+    if (heroPresentBtn) heroPresentBtn.addEventListener('click', enterPresentation);
+  })();
   </script>
 </body>
 </html>
