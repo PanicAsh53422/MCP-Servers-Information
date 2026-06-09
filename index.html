@@ -782,7 +782,6 @@
       position: absolute;
       inset: 0;
       display: flex;
-      align-items: center;
       justify-content: center;
       padding: 60px 48px;
       opacity: 0;
@@ -790,6 +789,11 @@
       transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
       pointer-events: none;
       overflow-y: auto;
+    }
+
+    .slide > div {
+      margin-top: auto;
+      margin-bottom: auto;
     }
 
     .slide.active {
@@ -816,6 +820,64 @@
     body.presenting.cursor-hidden,
     body.presenting.cursor-hidden * {
       cursor: none !important;
+    }
+
+    .slide .code-copy-wrap {
+      position: relative;
+    }
+    .slide .code-copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 3px 10px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 5px;
+      color: var(--accent);
+      font-family: var(--font-code);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      z-index: 5;
+      line-height: 1.6;
+    }
+    .slide .code-copy-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.45);
+    }
+    .slide .code-copy-btn.copied {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .slide .pres-condensed {
+      cursor: pointer;
+      position: relative;
+    }
+    .slide .pres-condensed .pres-full-body {
+      display: none;
+    }
+    .slide .pres-condensed.pres-expanded .pres-summary {
+      display: none;
+    }
+    .slide .pres-condensed.pres-expanded .pres-full-body {
+      display: block;
+    }
+    .slide .pres-condensed .pres-expand-icon {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.2);
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .slide .pres-condensed:hover .pres-expand-icon {
+      color: rgba(255,255,255,0.5);
+    }
+    .slide .pres-condensed.pres-expanded .pres-expand-icon {
+      transform: rotate(180deg);
+      color: var(--accent);
     }
 
     /* ── Responsive ── */
@@ -1062,10 +1124,10 @@
           <div class="card-num">01</div>
           <div class="card-title">Filesystem: read and write local files</div>
           <div class="card-body">
-            The simplest MCP server and the best one to start with. Give it a directory path in the config and Claude gets read/write access to every file inside it: list directories, read file contents, write new files, search by name or content. It's sandboxed to the folder you specify, so you control exactly what Claude can touch. It uses only stdio and needs no API key, which makes it the easiest way to confirm your MCP setup is working before moving on to more complex servers.<br><br>
-            <strong>Classroom use:</strong> Have Claude read your notes folder and summarize what you worked on this week.<br><br>
+            Give it a directory path in the config and Claude gets read/write access to every file inside it: list directories, read file contents, write new files, search by name or content. It's sandboxed to the folder you specify, so you control exactly what Claude can touch. It uses only stdio and needs no API key. Note: Claude CLI already has built-in file access within your project directory, so this server is mainly useful when you want Claude to access files outside your project or when using other MCP clients like Claude Desktop or Cursor that don't have built-in filesystem tools.<br><br>
+            <strong>Classroom use:</strong> Give Claude access to a shared notes folder outside your project and ask it to summarize what the team worked on this week.<br><br>
             <code class="inline-code">npx -y @modelcontextprotocol/server-filesystem /path/to/folder</code>
-            <div class="card-takeaway"><strong>Key takeaway:</strong> Start here. No API key needed, and getting it working proves your entire setup is correct.</div>
+            <div class="card-takeaway"><strong>Key takeaway:</strong> Useful for accessing files outside your project directory, or for MCP clients that don't have built-in file access.</div>
           </div>
         </div>
         <div class="glass-card reveal">
@@ -1201,7 +1263,7 @@
       <div class="section-eyebrow">06 / Hands-on</div>
       <h2 class="section-title">Getting <span class="gradient-text">Started</span></h2>
       <p class="section-desc">
-        Connect an MCP server to Claude CLI in four steps. We'll use the Filesystem server as the example. No API key needed, and it works immediately. If you prefer a GUI, Claude Desktop supports the same servers &mdash; the servers section of this guide covers both.
+        Connect an MCP server to Claude CLI in four steps. We'll use the Memory server as the example &mdash; it gives Claude persistent memory across sessions using a local knowledge graph. No API key needed, and it works immediately. If you prefer a GUI, Claude Desktop supports the same servers &mdash; the servers section of this guide covers both.
       </p>
       <div class="steps-grid">
         <div class="step-card reveal">
@@ -1220,10 +1282,10 @@
         <div class="step-card reveal">
           <div class="step-num">2</div>
           <div class="step-content">
-            <div class="step-title">Add the Filesystem server</div>
+            <div class="step-title">Add the Memory server</div>
             <div class="step-desc">
-              Run this command to connect the Filesystem server. Replace <code class="inline-code">~/Documents</code> with the folder you want Claude to access.
-              <code class="code-block">claude mcp add filesystem npx -y @modelcontextprotocol/server-filesystem ~/Documents</code>
+              Run this command to connect the Memory server. It stores a knowledge graph as a local JSONL file that persists across sessions.
+              <code class="code-block">claude mcp add memory -- npx -y @modelcontextprotocol/server-memory</code>
               That's it. No config file to edit, no restart needed.
             </div>
           </div>
@@ -1249,9 +1311,9 @@
             <div class="step-desc">
               Check your connected servers:
               <code class="code-block">claude mcp list</code>
-              You should see <code class="inline-code">filesystem</code> listed. Then start a chat and test it:
+              You should see <code class="inline-code">memory</code> listed. Then start a chat and test it:
               <code class="code-block">claude</code>
-              Type: <em>"List the files in my Documents folder."</em> Claude should call the <code class="inline-code">list_directory</code> tool and return the results. You'll see the tool call appear inline before the response.
+              Type: <em>"Remember that my favorite language is Python and I'm learning about MCP."</em> Claude should call the <code class="inline-code">create_entities</code> tool to store that. Close the chat, start a new one, and ask <em>"What do you know about me?"</em> &mdash; Claude will recall it from the knowledge graph.
             </div>
           </div>
         </div>
@@ -1630,41 +1692,161 @@ await server.connect(transport); // requires "type":"module" in package.json</co
     if (!container || !progress) return;
 
     var sectionIds = ['hero', 'what-is-mcp', 'how-it-works', 'core-capabilities', 'popular-servers', 'use-cases', 'getting-started', 'code-examples'];
-    var DISSOLVE_TRANSITIONS = [[0, 1], [3, 4]];
+    var SECTION_TRANSITIONS = {
+      'what-is-mcp': 'dissolve',
+      'how-it-works': 'flip',
+      'popular-servers': 'dissolve',
+      'use-cases': 'zoom',
+      'getting-started': 'blur',
+      'code-examples': 'glitch'
+    };
+    var sectionFirstSlide = {};
     var slides = [];
     var currentSlide = 0;
     var isPresenting = false;
     var transitioning = false;
     var cursorTimer = null;
 
+    var MAX_PER_SLIDE = 2;
+
+    function getFirstSentence(text) {
+      text = text.trim();
+      var match = text.match(/^[^.!?]+[.!?]/);
+      return match ? match[0].trim() : (text.length > 100 ? text.substring(0, 100) + '...' : text);
+    }
+
+    function buildSectionHeader(source, isContinuation) {
+      var html = '';
+      var eyebrow = source.querySelector('.section-eyebrow');
+      var title = source.querySelector('.section-title');
+      var desc = source.querySelector('.section-desc');
+      if (eyebrow) html += '<div class="section-eyebrow">' + eyebrow.innerHTML + '</div>';
+      if (title) html += '<h2 class="section-title">' + title.innerHTML + '</h2>';
+      if (!isContinuation && desc) html += '<p class="section-desc">' + desc.innerHTML + '</p>';
+      if (isContinuation) html += '<p class="section-desc" style="opacity:0.35;font-size:13px;font-style:italic;">continued</p>';
+      return html;
+    }
+
+    function buildCondensedCard(original) {
+      var expandIcon = '<span class="pres-expand-icon">&#9662;</span>';
+      if (original.classList.contains('step-card')) {
+        var sNum = original.querySelector('.step-num');
+        var sTitle = original.querySelector('.step-title');
+        var sDesc = original.querySelector('.step-desc');
+        var summary = sDesc ? getFirstSentence(sDesc.textContent) : '';
+        var fullDesc = sDesc ? sDesc.innerHTML : '';
+        return '<div class="step-card reveal visible pres-condensed">' + expandIcon +
+          (sNum ? '<div class="step-num">' + sNum.textContent + '</div>' : '') +
+          '<div class="step-content">' +
+            '<div class="step-title">' + (sTitle ? sTitle.textContent : '') + '</div>' +
+            '<div class="pres-summary"><div class="step-desc" style="font-size:13px;opacity:0.5;margin-top:4px;">' + summary + '</div></div>' +
+            '<div class="pres-full-body"><div class="step-desc">' + fullDesc + '</div></div>' +
+          '</div></div>';
+      }
+      var cNum = original.querySelector('.card-num');
+      var cTitle = original.querySelector('.card-title');
+      var takeaway = original.querySelector('.card-takeaway');
+      var fullBody = original.querySelector('.card-body');
+      var takeawayHTML = takeaway ? takeaway.innerHTML : '';
+      var fullHTML = fullBody ? fullBody.innerHTML : '';
+      return '<div class="glass-card reveal visible pres-condensed">' + expandIcon +
+        (cNum ? '<div class="card-num">' + cNum.textContent + '</div>' : '') +
+        (cTitle ? '<div class="card-title">' + cTitle.textContent + '</div>' : '') +
+        (takeawayHTML ? '<div class="pres-summary"><div class="card-body" style="font-size:13px;margin-top:8px;">' + takeawayHTML + '</div></div>' : '') +
+        (fullHTML ? '<div class="pres-full-body"><div class="card-body">' + fullHTML + '</div></div>' : '') +
+        '</div>';
+    }
+
+    function addSlide(html) {
+      var slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.dataset.index = slides.length;
+      var content = document.createElement('div');
+      content.style.maxWidth = '1200px';
+      content.style.width = '100%';
+      content.style.padding = '0 48px';
+      content.innerHTML = html;
+      content.querySelectorAll('.reveal').forEach(function(el) {
+        el.classList.add('visible');
+        el.style.transitionDelay = '0s';
+      });
+      slide.appendChild(content);
+      container.appendChild(slide);
+      slides.push(slide);
+    }
+
     function buildSlides() {
       container.innerHTML = '';
       progress.innerHTML = '';
       slides = [];
+      sectionFirstSlide = {};
 
-      sectionIds.forEach(function(id, i) {
+      sectionIds.forEach(function(id) {
         var source = document.getElementById(id);
         if (!source) return;
 
-        var slide = document.createElement('div');
-        slide.className = 'slide';
-        slide.dataset.index = i;
+        sectionFirstSlide[id] = slides.length;
 
-        var content = document.createElement('div');
-        content.style.maxWidth = '1200px';
-        content.style.width = '100%';
-        content.style.padding = '0 48px';
-        content.innerHTML = source.innerHTML;
+        if (id === 'hero' || id === 'code-examples') {
+          addSlide(source.innerHTML);
+          return;
+        }
 
-        content.querySelectorAll('.reveal').forEach(function(el) {
-          el.classList.add('visible');
-          el.style.transitionDelay = '0s';
+        var cards = source.querySelectorAll('.glass-card, .step-card');
+        var isSteps = id === 'getting-started';
+        var gridClass = isSteps ? 'steps-grid' : 'cards-grid';
+        var headerHTML = buildSectionHeader(source, false);
+
+        if (cards.length <= MAX_PER_SLIDE) {
+          var gridHTML = '<div class="' + gridClass + '">';
+          Array.from(cards).forEach(function(card) { gridHTML += buildCondensedCard(card); });
+          gridHTML += '</div>';
+          var takeaway = source.querySelector('.section-takeaway');
+          addSlide(headerHTML + gridHTML + (takeaway ? takeaway.outerHTML : ''));
+        } else {
+          var cardArray = Array.from(cards);
+          var numChunks = Math.ceil(cardArray.length / MAX_PER_SLIDE);
+          var perChunk = Math.ceil(cardArray.length / numChunks);
+          for (var ci = 0; ci < cardArray.length; ci += perChunk) {
+            var chunk = cardArray.slice(ci, ci + perChunk);
+            var hdr = ci === 0 ? headerHTML : buildSectionHeader(source, true);
+            var gHTML = '<div class="' + gridClass + '">';
+            chunk.forEach(function(card) { gHTML += buildCondensedCard(card); });
+            gHTML += '</div>';
+            addSlide(hdr + gHTML);
+          }
+        }
+      });
+
+      container.querySelectorAll('.pres-condensed').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('.code-copy-btn')) return;
+          e.stopPropagation();
+          card.classList.toggle('pres-expanded');
         });
+      });
 
-        slide.appendChild(content);
-        container.appendChild(slide);
-        slides.push(slide);
+      container.querySelectorAll('.code-block').forEach(function(codeEl) {
+        var wrap = document.createElement('div');
+        wrap.className = 'code-copy-wrap';
+        codeEl.parentNode.insertBefore(wrap, codeEl);
+        wrap.appendChild(codeEl);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'code-copy-btn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          navigator.clipboard.writeText(codeEl.textContent.trim()).then(function() {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+          });
+        });
+        wrap.appendChild(btn);
+      });
 
+      slides.forEach(function(_, i) {
         var dot = document.createElement('div');
         dot.className = 'pres-dot';
         dot.addEventListener('click', function() { goToSlide(i); });
@@ -1686,10 +1868,32 @@ await server.connect(transport); // requires "type":"module" in package.json</co
       if (counter) counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
     }
 
-    function isDissolveTransition(from, to) {
-      return DISSOLVE_TRANSITIONS.some(function(pair) {
-        return pair[0] === from && pair[1] === to;
-      });
+    function getSectionForSlide(slideIdx) {
+      var result = sectionIds[0];
+      for (var i = 0; i < sectionIds.length; i++) {
+        var id = sectionIds[i];
+        if (sectionFirstSlide[id] !== undefined && sectionFirstSlide[id] <= slideIdx) result = id;
+      }
+      return result;
+    }
+
+    function getTransitionType(from, to) {
+      if (getSectionForSlide(from) === getSectionForSlide(to)) return 'slide';
+      if (to > from) {
+        for (var i = 0; i < sectionIds.length; i++) {
+          var id = sectionIds[i];
+          if (sectionFirstSlide[id] === to && SECTION_TRANSITIONS[id]) return SECTION_TRANSITIONS[id];
+        }
+      }
+      return 'cinematic';
+    }
+
+    function clearSlideAnimStyles(el) {
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('transform');
+      el.style.removeProperty('transition');
+      el.style.removeProperty('filter');
+      el.style.removeProperty('transform-origin');
     }
 
     function getAnimatableElements(slide) {
@@ -1744,38 +1948,208 @@ await server.connect(transport); // requires "type":"module" in package.json</co
       });
     }
 
+    function transitionSlide(oldSlide, newSlide, forward) {
+      var dir = forward ? 1 : -1;
+      oldSlide.style.transition = 'opacity 0.3s ease-in, transform 0.3s ease-in';
+      oldSlide.style.opacity = '0';
+      oldSlide.style.transform = 'translateX(' + (-100 * dir) + 'px)';
+      setTimeout(function() {
+        oldSlide.classList.remove('active');
+        clearSlideAnimStyles(oldSlide);
+        newSlide.style.transition = 'none';
+        newSlide.style.opacity = '0';
+        newSlide.style.transform = 'translateX(' + (100 * dir) + 'px)';
+        newSlide.classList.add('active');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            newSlide.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+            newSlide.style.opacity = '1';
+            newSlide.style.transform = 'translateX(0) scale(1)';
+            setTimeout(function() { clearSlideAnimStyles(newSlide); transitioning = false; }, 450);
+          });
+        });
+      }, 320);
+    }
+
+    function transitionZoom(oldSlide, newSlide) {
+      oldSlide.style.transition = 'opacity 0.5s ease-in, transform 0.5s ease-in';
+      oldSlide.style.opacity = '0';
+      oldSlide.style.transform = 'scale(1.8)';
+      setTimeout(function() {
+        oldSlide.classList.remove('active');
+        clearSlideAnimStyles(oldSlide);
+        newSlide.style.transition = 'none';
+        newSlide.style.opacity = '0';
+        newSlide.style.transform = 'scale(0.5)';
+        newSlide.classList.add('active');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            newSlide.style.transition = 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+            newSlide.style.opacity = '1';
+            newSlide.style.transform = 'scale(1)';
+            staggerRevealIn(newSlide);
+            setTimeout(function() { clearSlideAnimStyles(newSlide); transitioning = false; }, 700);
+          });
+        });
+      }, 520);
+    }
+
+    function transitionBlur(oldSlide, newSlide) {
+      oldSlide.style.transition = 'opacity 0.5s ease-in, filter 0.5s ease-in, transform 0.5s ease-in';
+      oldSlide.style.opacity = '0';
+      oldSlide.style.filter = 'blur(20px)';
+      oldSlide.style.transform = 'scale(1.05)';
+      setTimeout(function() {
+        oldSlide.classList.remove('active');
+        clearSlideAnimStyles(oldSlide);
+        newSlide.style.transition = 'none';
+        newSlide.style.opacity = '0';
+        newSlide.style.filter = 'blur(20px)';
+        newSlide.style.transform = 'scale(0.95)';
+        newSlide.classList.add('active');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            newSlide.style.transition = 'opacity 0.6s ease-out, filter 0.6s ease-out, transform 0.6s ease-out';
+            newSlide.style.opacity = '1';
+            newSlide.style.filter = 'blur(0px)';
+            newSlide.style.transform = 'scale(1)';
+            staggerRevealIn(newSlide);
+            setTimeout(function() { clearSlideAnimStyles(newSlide); transitioning = false; }, 700);
+          });
+        });
+      }, 520);
+    }
+
+    function transitionFlip(oldSlide, newSlide) {
+      container.style.perspective = '1200px';
+      oldSlide.style.transition = 'opacity 0.4s ease-in, transform 0.5s ease-in';
+      oldSlide.style.opacity = '0';
+      oldSlide.style.transform = 'rotateY(-90deg)';
+      oldSlide.style.transformOrigin = 'center center';
+      setTimeout(function() {
+        oldSlide.classList.remove('active');
+        clearSlideAnimStyles(oldSlide);
+        newSlide.style.transition = 'none';
+        newSlide.style.opacity = '0';
+        newSlide.style.transform = 'rotateY(90deg)';
+        newSlide.style.transformOrigin = 'center center';
+        newSlide.classList.add('active');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            newSlide.style.transition = 'opacity 0.4s ease-out, transform 0.5s ease-out';
+            newSlide.style.opacity = '1';
+            newSlide.style.transform = 'rotateY(0deg)';
+            staggerRevealIn(newSlide);
+            setTimeout(function() {
+              clearSlideAnimStyles(newSlide);
+              container.style.removeProperty('perspective');
+              transitioning = false;
+            }, 600);
+          });
+        });
+      }, 520);
+    }
+
+    function transitionGlitch(oldSlide, newSlide) {
+      var outFrames = [
+        { x: -5, y: 2, skew: 2, o: 0.8, hue: 20 },
+        { x: 8, y: -3, skew: -3, o: 0.6, hue: -30 },
+        { x: -3, y: 5, skew: 1, o: 0.4, hue: 50 },
+        { x: 6, y: -2, skew: -2, o: 0.15, hue: -20 }
+      ];
+      var fi = 0;
+      var outInt = setInterval(function() {
+        if (fi >= outFrames.length) {
+          clearInterval(outInt);
+          oldSlide.classList.remove('active');
+          clearSlideAnimStyles(oldSlide);
+          newSlide.style.transition = 'none';
+          newSlide.style.opacity = '0';
+          newSlide.classList.add('active');
+          var inFrames = [
+            { x: 4, y: -2, skew: -1, o: 0.3, hue: -15 },
+            { x: -3, y: 1, skew: 2, o: 0.6, hue: 25 },
+            { x: 1, y: -1, skew: 0, o: 0.85, hue: 0 }
+          ];
+          var ii = 0;
+          var inInt = setInterval(function() {
+            if (ii >= inFrames.length) {
+              clearInterval(inInt);
+              newSlide.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out, filter 0.2s ease-out';
+              newSlide.style.opacity = '1';
+              newSlide.style.transform = 'translate(0,0) skewX(0deg)';
+              newSlide.style.filter = 'hue-rotate(0deg)';
+              staggerRevealIn(newSlide);
+              setTimeout(function() { clearSlideAnimStyles(newSlide); transitioning = false; }, 500);
+              return;
+            }
+            var g = inFrames[ii];
+            newSlide.style.transform = 'translate(' + g.x + 'px,' + g.y + 'px) skewX(' + g.skew + 'deg)';
+            newSlide.style.opacity = String(g.o);
+            newSlide.style.filter = 'hue-rotate(' + g.hue + 'deg)';
+            ii++;
+          }, 60);
+          return;
+        }
+        var f = outFrames[fi];
+        oldSlide.style.transform = 'translate(' + f.x + 'px,' + f.y + 'px) skewX(' + f.skew + 'deg)';
+        oldSlide.style.opacity = String(f.o);
+        oldSlide.style.filter = 'hue-rotate(' + f.hue + 'deg)';
+        fi++;
+      }, 70);
+    }
+
     function goToSlide(idx) {
       if (transitioning || idx === currentSlide || idx < 0 || idx >= slides.length) return;
       transitioning = true;
 
       var from = currentSlide;
       var to = idx;
-      var useDissolve = isDissolveTransition(from, to);
+      var forward = to > from;
+      var type = getTransitionType(from, to);
       var oldSlide = slides[from];
       var newSlide = slides[to];
 
-      if (useDissolve) {
-        dissolveOut(oldSlide, function() {
-          oldSlide.classList.remove('active');
-          newSlide.classList.add('active');
-          setTimeout(function() {
-            dissolveIn(newSlide);
-            setTimeout(function() { transitioning = false; }, 700);
-          }, 200);
-        });
-      } else {
-        oldSlide.classList.add('exiting');
-        oldSlide.classList.remove('active');
-        setTimeout(function() {
-          oldSlide.classList.remove('exiting');
-          newSlide.classList.add('active');
-          staggerRevealIn(newSlide);
-          setTimeout(function() { transitioning = false; }, 600);
-        }, 400);
-      }
-
       currentSlide = to;
       updateProgress();
+
+      switch (type) {
+        case 'dissolve':
+          dissolveOut(oldSlide, function() {
+            oldSlide.classList.remove('active');
+            newSlide.classList.add('active');
+            setTimeout(function() {
+              dissolveIn(newSlide);
+              setTimeout(function() { transitioning = false; }, 700);
+            }, 200);
+          });
+          break;
+        case 'slide':
+          transitionSlide(oldSlide, newSlide, forward);
+          break;
+        case 'zoom':
+          transitionZoom(oldSlide, newSlide);
+          break;
+        case 'blur':
+          transitionBlur(oldSlide, newSlide);
+          break;
+        case 'flip':
+          transitionFlip(oldSlide, newSlide);
+          break;
+        case 'glitch':
+          transitionGlitch(oldSlide, newSlide);
+          break;
+        default:
+          oldSlide.classList.add('exiting');
+          oldSlide.classList.remove('active');
+          setTimeout(function() {
+            oldSlide.classList.remove('exiting');
+            newSlide.classList.add('active');
+            staggerRevealIn(newSlide);
+            setTimeout(function() { transitioning = false; }, 600);
+          }, 400);
+          break;
+      }
     }
 
     function enterPresentation() {
